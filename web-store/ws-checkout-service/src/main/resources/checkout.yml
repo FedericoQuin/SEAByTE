@@ -1,0 +1,11 @@
+# Spring properties
+spring:
+  application:
+     name: ws-checkout-service
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://ws-registration-service/eureka/
+

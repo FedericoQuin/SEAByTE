@@ -1,0 +1,11 @@
+
+
+server:
+  port: 8070
+  
+spring:
+  web:
+    resources:
+      static-locations: 
+        - "file:src/main/resources/static/" 
+        - "classpath:/static/"

@@ -1,0 +1,10 @@
+
+
+
+export const COLORS = {
+    STATUS_LABEL_COLOR_SUCCES: '#11cc11',
+    STATUS_LABEL_COLOR_FAIL: '#ff0000',
+    STATUS_LABEL_COLOR_PENDING: '#696969'
+};
+
+

@@ -1,0 +1,56 @@
+
+.navigation {
+    display: flex;
+    flex-flow: row wrap;
+    /* This aligns items to the end line on main-axis */
+    justify-content: flex;
+
+
+    list-style: none;
+    margin: 0; 
+    background: rgb(34, 111, 253);
+}
+
+.navigation a {
+    text-decoration: none;
+    display: block;
+    padding: 1em;
+    color: white;
+}
+
+.navigation a:hover {
+    background: #1565C0;
+}
+
+
+.navigation label {
+    text-decoration: none;
+    display: block;
+    padding: 1em;
+    color: black;
+    background: lightskyblue;
+}
+
+
+.container {
+    display: grid;
+    grid-template-columns: 320px repeat(2, 170px);/* repeat(3, 320px);  */
+}
+
+.flex-item-c1 {
+    background: rgb(219, 218, 218);
+    padding: 5px;
+    max-width: 300px;
+}
+
+.flex-item-c2 {
+    background: lightgreen;
+    padding: 5px;
+    max-width: 150px;
+}
+
+.flex-item-c3 {
+    background: rgb(219, 218, 218);
+    padding: 5px;
+    max-width: 150px;
+}

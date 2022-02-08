@@ -1,0 +1,17 @@
+# Spring properties
+spring:
+  application:
+     name: ws-inventory-service
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://ws-registration-service/eureka/
+
+
+# data:
+#   mongodb:
+#     host: ws-inventory-mongo
+#     database: inventory
+#     port: 27017

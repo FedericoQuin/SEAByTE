@@ -1,0 +1,44 @@
+
+
+
+<html>
+  <head>
+    <title>Login Page Web-Shop</title>
+    <meta name="author" content="Federico Quin">
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <script type="text/javascript" src="login.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+  </head>
+
+
+  <body onload="onLoadBodyLogin()">
+
+    <div id="navigation-bar">
+      <nav class="navigation" role="navigation">
+        <li><a id="home" href="/">Home page</a></li>
+        <li><a id="store" href="/store">Store page</a></li>
+        <li><a id="login" href="/login">Login page</a></li>
+        <li><label id="user"></label></li>
+      </nav>
+    </div>
+    <br>
+
+
+    <form id="form-login">
+      <div id="username-div">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+      </div><br>
+      <div id="password-div">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+      </div><br>
+      <div class="button">
+        <button type="button" onclick="login()">Login</button>
+      </div><br>
+    </form>
+    <br>
+
+    <label id="login-status"></label>
+  </body>
+</html>

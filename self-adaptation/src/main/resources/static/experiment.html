@@ -1,0 +1,114 @@
+<html>
+
+<head>
+  <title>Dashboard Self-AB-Test</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script async type="module" src="/js/experiment.js"></script>
+  <style>
+  body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+  .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+  .fa-anchor,.fa-coffee {font-size:200px}
+  </style>
+</head>
+
+<body>
+<section class="top-menu">
+  <div class="w3-top" style="border-radius: 5px; padding: 20px;">
+    <div class="w3-bar w3-blue w3-card w3-left-align w3-large" style="border-radius: 10px; padding: 10px;">
+      <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-blue" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+      <a href="/" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Home</a>
+      <a href="/setup" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Setup</a>
+      <a href="/profile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Profile</a>
+      <a href="/experiment" class="w3-bar-item w3-button w3-padding-large w3-white">Experiment</a>
+      <a href="/rule" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Rule</a>
+      <a href="/run" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Run</a>
+    </div>
+  </div>
+  <div style="padding: 128px 16px">
+    <div class="configuration-block" id="default-test">
+      <button type="button" class="green-button" style="width: 40%; max-width: 250px; padding: 8px;" onclick="publishDefaultExperiments()">Add default experiments</button>
+    </div>
+
+    <!-- <p><b><u>Configuration of A/B experiments in the Web-Store</u></b></p> -->
+
+    <div class="configuration-block" id="custom-test" style="margin-top: 30px;">
+      <label><b>Setup custom AB experiment</b></label>
+      <form name="form-experiment" id="form-experiment" onsubmit="return publishExperiment()" action="javascript: void(0);">
+        <label for="nameExperiment">Name:</label>
+        <input type="text" id="nameExperiment" name="nameExperiment"><br>
+
+        <label for="variant-A">Variant A:</label>
+        <input type="text" id="variant-A" name="variant-A"><br>
+        <label for="variant-B">Variant B:</label>
+        <input type="text" id="variant-B" name="variant-B"><br>
+
+        <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+          <div class="steps bg-gray"><label for="user-profile">User profile:</label></div>
+          <select id="user-profile" name="user-profile">
+            <option selected disabled hidden>Select user profile...</option>
+          </select>
+        </div>
+
+        <div class="grid-container" style="grid-template-columns: 1fr 1fr 1fr;">
+          <div class="steps bg-gray"><label for="ab-assignment">AB assignment:</label></div>
+          <input type="number" id="a-assignment" name="a-assignment" placeholder="weight for A...">
+          <input type="number" id="b-assignment" name="b-assignment" placeholder="weight for B...">
+        </div>
+        
+        <label for="metrics">Metrics (separated by commas):</label>
+        <input type="text" id="metrics" name="metrics"><br>
+
+        <label for="null-hypothesis">Null hypothesis (left operand - operator - right operand):</label>
+        <div class="grid-container" style="grid-template-columns: 2fr 1fr 2fr;">
+          <div class="grid-item"><input type="text" id="null-hypothesis-left" name="null-hypothesis-left"></div>
+          <div class="grid-item"><input type="text" id="null-hypothesis-operator" name="null-hypothesis-operator"></div>
+          <div class="grid-item"><input type="text" id="null-hypothesis-right" name="null-hypothesis-right"></div>
+        </div>
+        
+
+        <label for="p-value">P value:</label>
+        <input type="number" id="p-value" name="p-value" step="0.001"><br>
+
+        <label for="samples">Number of samples:</label>
+        <input type="number" id="samples" name="samples"><br>
+
+        <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+          <div class="steps bg-gray"><label for="type-statistical-test">Statistical test:</label></div>
+          <select id="type-statistical-test" name="type-statistical-test">
+            <option selected disabled hidden>Select test...</option>
+            <option value="t-test">Student test</option>
+            <option value="welsh-t-test">Welsh's student test</option>
+            <option value="one-proportional-test">One-proportional test</option>
+          </select>
+        </div>
+
+        <label for="resulting-variable-name">Variable name result statistical test:</label>
+        <input type="text" id="resulting-variable-name" name="resulting-variable-name"><br>
+        
+        <br>
+        <input type="submit" class="green-button" id="submit-form-ab-test" value="submit" action="javascript:void(0);">
+      </form>
+    </div>
+
+    <!-- <div style="margin: 10px; margin-top: 40px;">
+      <button type="button" class="green-button" style="width: 50%; max-width: 300px;" onclick="publishDefaultExperiments()">Generate default experiments</button>
+    </div> -->
+  </div>
+</section>
+
+<section class="main-body">
+</section>
+
+<script>
+window.onload = function() {
+  getProfiles();
+}
+</script>
+</body>
+
+
+</html>

@@ -1,0 +1,70 @@
+<html>
+
+<head>
+  <title>Dashboard Self-AB-Test</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script async type="module" src="/js/rule.js"></script>
+  <style>
+  body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+  .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+  .fa-anchor,.fa-coffee {font-size:200px}
+  </style>
+</head>
+
+<body>
+<section class="top-menu">
+  <div class="w3-top" style="border-radius: 5px; padding: 20px;">
+    <div class="w3-bar w3-blue w3-card w3-left-align w3-large" style="border-radius: 10px; padding: 10px;">
+      <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-blue" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+      <a href="/" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Home</a>
+      <a href="/setup" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Setup</a>
+      <a href="/profile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Profile</a>
+      <a href="/experiment" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Experiment</a>
+      <a href="/rule" class="w3-bar-item w3-button w3-padding-large w3-white">Rule</a>
+      <a href="/run" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Run</a>
+    </div>
+  </div>
+  <div style="padding: 128px 16px">
+    <div class="configuration-block" id="default-rule">
+      <button type="button" class="green-button" style="width: 40%; max-width: 250px; padding: 8px;" onclick="addDefaultTransitionRules()">Add default transition rules</button><br><br>
+    </div>
+
+    <div class="configuration-block" id="custom-rule" style="margin-top: 30px;">
+      <label><b>Transition rule</b></label>
+      <form name="form-transition-rule" id="form-transition-rule" onsubmit="return addTransitionRule()" action="javascript: void(0);">
+        <label for="nameRule">Name:</label>
+        <input type="text" id="nameRule" name="nameRule"><br>
+
+        <label for="fromExperiment">From experiment:</label>
+        <input type="text" id="fromExperiment" name="fromExperiment"><br>
+
+        <label for="toExperiment">To experiment:</label>
+        <input type="text" id="toExperiment" name="toExperiment"><br>
+
+
+        <label for="condition" title="e.g. result-stat != reject">Condition (left operand - operator - right operand):</label>
+        <div class="grid-container" style="grid-template-columns: 2fr 1fr 2fr;">
+          <div class="grid-item"><input type="text" id="conditionLeftOperand" name="conditionLeftOperand"></div>
+          <div class="grid-item"><input type="text" id="conditionOperator" name="conditionOperator"></div>
+          <div class="grid-item"><input type="text" id="conditionRightOperand" name="conditionRightOperand"></div>
+        </div>
+
+        <input type="submit" class="green-button" id="submit-form-transition-rule" value="submit" action="javascript:void(0);">
+      </form>
+    </div>
+
+    <div class="status">
+      <label id="status-label"></label><br>
+    </div>
+  </div>
+</section>
+
+<section class="main-body">
+</section>
+</body>
+
+</html>

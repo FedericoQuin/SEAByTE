@@ -1,0 +1,75 @@
+<html>
+
+<head>
+  <title>Dashboard Self-AB-Test</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script async type="module" src="/js/setup.js"></script>
+  <style>
+  body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+  .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+  .fa-anchor,.fa-coffee {font-size:200px}
+  </style>
+</head>
+
+<body>
+<section class="top-menu">
+  <div class="w3-top" style="border-radius: 5px; padding: 20px;">
+    <div class="w3-bar w3-blue w3-card w3-left-align w3-large" style="border-radius: 10px; padding: 10px;">
+      <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-blue" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+      <a href="/" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Home</a>
+      <a href="/setup" class="w3-bar-item w3-button w3-padding-large w3-white">Setup</a>
+      <a href="/profile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Profile</a>
+      <a href="/experiment" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Experiment</a>
+      <a href="/rule" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Rule</a>
+      <a href="/run" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Run</a>
+    </div>
+  </div>
+  <div style="padding: 128px 16px">
+    <div class="configuration-block" id="default-setup">
+      <button type="button" class="green-button" style="width: 40%; max-width: 200px; padding: 8px;" onclick="addDefaultSetup()">Add default setup</button><br><br>
+    </div>
+    <!-- <p><b><u>Setup of A/B tests in the Web-Store</u></b></p> -->
+
+    <div class="configuration-block" id="custom-setup" style="margin-top: 30px;">
+      <label><b>Setup AB test</b></label>
+      <form name="form-setup" id="form-setup" onsubmit="return sendCustomSetup()" action="javascript: void(0);">
+        <label for="nameSetup">Name:</label>
+        <input type="text" id="nameSetup" name="nameSetup"><br>
+
+        <label for="commission">Commissions (service name - docker image):</label>
+        <div class="grid-container" style="grid-template-columns: 1fr 2fr 2fr;">
+          <div class="grid-item steps bg-gray"><label>Version A:</label></div>
+          <div class="grid-item"><input type="text" id="commission-A-container" name="commission-A-container"></div>
+          <div class="grid-item"><input type="text" id="commission-A-image" name="commission-A-image"></div>
+
+          <div class="grid-item steps bg-gray"><label>Version B:</label></div>
+          <div class="grid-item"><input type="text" id="commission-B-container" name="commission-B-container"></div>
+          <div class="grid-item"><input type="text" id="commission-B-image" name="commission-B-image"></div>
+
+          <div class="grid-item steps bg-gray"><label>AB component:</label></div>
+          <div class="grid-item"><input type="text" id="ab-component-container" name="ab-component-container"></div>
+          <div class="grid-item"><input type="text" id="ab-component-image" name="ab-component-image"></div>
+        </div>
+
+        <label for="decommission">Decommission (service name):</label>
+        <input type="text" id="decommission" name="decommission"><br>
+
+        <input type="submit" class="green-button" id="submit-form-ab-setup" value="submit" action="javascript:void(0);">
+      </form>
+    </div>
+
+    <div class="status">
+      <label id="status-label"></label><br>
+    </div>
+  </div>
+</section>
+
+<section class="main-body">
+</section>
+</body>
+
+</html>

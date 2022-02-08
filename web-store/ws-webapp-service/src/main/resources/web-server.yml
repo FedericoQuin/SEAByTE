@@ -1,0 +1,11 @@
+# Spring properties
+spring:
+  application:
+     name: ws-webapp-service
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://ws-registration-service/eureka/
+

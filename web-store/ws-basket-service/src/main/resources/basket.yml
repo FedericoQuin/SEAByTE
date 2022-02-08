@@ -1,0 +1,11 @@
+# Spring properties
+spring:
+  application:
+     name: ws-basket-service
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://ws-registration-service/eureka/
+

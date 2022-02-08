@@ -1,0 +1,275 @@
+version: "3.7"
+services:
+
+  main-dependency-image:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    image: main-dependency-image:${VERSION}
+    deploy:
+      replicas: 0
+
+
+
+  ws-registration-service:
+    build: 
+      context: .
+      dockerfile: ws-registration-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-registration-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: 1
+
+
+  ws-webapp-service:
+    build: 
+      context: .
+      dockerfile: ws-webapp-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-webapp-service-image:${VERSION}
+    depends_on: 
+      # aware that this dependency is still suboptimal, does not wait until eureka server has actually started
+      - main-dependency-image
+      - ws-registration-service
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_WEBAPP_AMT_INSTANCES}
+
+  ws-inventory-service:
+    build: 
+      context: .
+      dockerfile: ws-inventory-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-inventory-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+      - ws-inventory-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_INVENTORY_AMT_INSTANCES}
+
+  ws-inventory-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
+
+
+  ws-login-service:
+    build: 
+      context: .
+      dockerfile: ws-login-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-login-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+      - ws-accounts-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_LOGIN_AMT_INSTANCES}
+
+  ws-accounts-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
+
+
+  ws-pricing-service:
+    build: 
+      context: .
+      dockerfile: ws-pricing-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-pricing-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+      - ws-pricing-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_PRICING_AMT_INSTANCES}
+
+
+  ws-pricing-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
+
+
+
+  ws-user-service:
+    build: 
+      context: .
+      dockerfile: ws-user-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-user-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+      - ws-user-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_USER_AMT_INSTANCES}
+
+
+  ws-user-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
+
+
+  ws-basket-service:
+    build: 
+      context: .
+      dockerfile: ws-basket-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-basket-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+      - ws-basket-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_BASKET_AMT_INSTANCES}
+
+
+  ws-basket-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
+
+  ws-checkout-service:
+    build: 
+      context: .
+      dockerfile: ws-checkout-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-checkout-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_CHECKOUT_AMT_INSTANCES}
+
+
+
+  ws-history-service:
+    build: 
+      context: .
+      dockerfile: ws-history-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-history-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+      - ws-history-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_HISTORY_AMT_INSTANCES}
+
+
+  ws-history-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
+
+  ws-recommendation-service:
+    build: 
+      context: .
+      dockerfile: ws-recommendation-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-recommendation-service-image:${VERSION}
+    depends_on:
+      - main-dependency-image
+      - ws-registration-service
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_RECOMMENDATION_AMT_INSTANCES}
+
+
+
+
+
+  nginx-service:
+    build:
+      context: .
+      dockerfile: nginx-service/Dockerfile
+    image: nginx-service-image:latest
+    ports: 
+      - 22:22
+      - 8080:80
+    networks:
+      custom-network:
+        aliases:
+          - nginx-service-${VERSION}
+    depends_on:
+      - ws-registration-service
+      - ws-webapp-service
+      - ws-inventory-service
+      - ws-login-service
+      - ws-pricing-service
+      - ws-user-service
+      - ws-basket-service
+      - ws-checkout-service
+      - ws-history-service
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+
+
+networks:
+  custom-network:
+    # external: true
+    driver: overlay
+    attachable: true

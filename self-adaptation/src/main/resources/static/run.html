@@ -1,0 +1,123 @@
+<html>
+
+<head>
+  <title>Dashboard Self-AB-Test</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script async type="module" src="/js/run.js"></script>
+  <style>
+  body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+  .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+  .fa-anchor,.fa-coffee {font-size:200px}
+  </style>
+</head>
+
+
+<body>
+
+<section class="top-menu">
+  <div class="w3-top" style="border-radius: 5px; padding: 20px;">
+    <div class="w3-bar w3-blue w3-card w3-left-align w3-large" style="border-radius: 10px; padding: 10px;">
+      <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-blue" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+      <a href="/" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Home</a>
+      <a href="/setup" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Setup</a>
+      <a href="/profile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Profile</a>
+      <a href="/experiment" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Experiment</a>
+      <a href="/rule" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Rule</a>
+      <a href="/run" class="w3-bar-item w3-button w3-padding-large w3-white">Run</a>
+    </div>    
+    <div style="padding: 5px 0px; margin-top: 20px;">
+      <div class="div-status" id="div-status"><label>Status:</label><label id="status-label">Idle</label></div>
+    </div>
+  </div>
+  <!-- <div style="padding: 128px 16px">
+
+
+  </div> -->
+</section>
+<section style="padding: 16px; margin-top: 156px; background-color: #f2f2f2;">
+  <main>
+
+
+    <div style="border: 1px; border-style: solid; width: 80%; margin: 30px 0px 0px 10px; max-width: 800px;">
+      <div style="margin: 5px 0px 5px 5px">
+        <label class="large">Available setups:</label><br>
+        <!-- <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><br> -->
+        <div class="grid-container-setups" id="list-setups" style="padding: 10px">
+        </div>
+      </div>
+
+      <div style="margin: 5px 0px 5px 5px">
+        <label class="large">Available experiments:</label>
+        <div class="grid-container-experiments" id="list-experiments" style="padding: 10px;">
+        </div>
+      </div>
+
+      <div style="margin: 5px 0px 5px 5px">
+        <label class="large">Available transition rules:</label>
+        <div id="list-rules" style="padding: 10px">
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-container" style="gap: 10px; margin: 40px 5px 5px 5px; width: 50%;">
+      <!-- <button type="button" onclick="runDefaultSetup();">Run default setup</button><br> -->
+      
+      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">  
+        <label class="steps run-label">Setup: </label>
+        <select id="setupName" name="setupName">
+          <option selected disabled hidden>Select setup...</option>
+        </select>
+      </div>
+
+
+      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+        <label class="run-label" style="padding-bottom: 23px;">Experiments:</label>
+        <div class="grid-container" id="selectExperiments" name="selectExperiments" style=" align-items: center;">
+        </div>
+      </div>
+
+      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+        <label class="run-label" style="padding-bottom: 23px;">Transition rules:</label>
+        <div class="grid-container" id="selectRules" name="selectRules">
+        </div>
+      </div>
+
+      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+        <label class="steps run-label">Initial experiment:</label>
+        <select id="initialExperiment" name="initialExperiment">
+          <option selected disabled hidden>Select initial experiment...</option>
+        </select>
+      </div>
+      
+      <!-- <input type="text" id="setupName" value="" style="width: 20%; margin: 5px 10px 5px 10px;"> -->
+      <!-- <button type="button" onclick="runSetup(document.getElementById('setupName').value);">Run setup</button> -->
+      <div style="margin-top: 20px"><button class="green-button" type="button" onclick="startFeedbackLoop();">Start feedback loop</button></div>
+    </div>
+
+    <div style="margin: 5px; width: 50%;">
+      <button type="button" class="red-button" onclick="stopFeedbackLoop();">Stop feedback loop</button>
+    </div>
+  </main>
+</section>
+
+
+
+<script>
+// import {populateSetups, populateExperiments} from './js/run.js';
+
+window.onload = function() {
+  // TODO render these into html server side instead
+  populateSetups();
+  populateExperiments();
+  populateRules();
+}
+</script>
+
+</body>
+
+
+</html>
