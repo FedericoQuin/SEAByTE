@@ -13,4 +13,5 @@ export $(grep -v '^#' .env | xargs -d '\n')
 
 
 echo "Building web-store with version tag $VERSION"
+docker-compose -f docker-swarm.yml build main-dependency-image
 docker-compose -f docker-swarm.yml build
