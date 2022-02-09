@@ -24,7 +24,6 @@ echo "Setting up Python 3 virtual environment used to run the end-user profiles 
 echo $'========================================================================================\n\n'
 cd ./self-adaptation/Locust \
 	&& python3 -m venv ./venv \
-	&& source ./venv/bin/activate \
-	&& pip3 install -r requirements.txt \
+	&& ./venv/bin/python3 -m pip install -r requirements.txt \
 	&& cd - > /dev/null
 
