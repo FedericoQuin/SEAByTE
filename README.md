@@ -34,12 +34,14 @@ Running the artifact first requires the installation of a few libraries. The fol
 
 Ensure that no root privileges are required to run docker on your machine (cfr. [Linux docker post installation steps](https://docs.docker.com/engine/install/linux-postinstall/)).
 
+Docker compose v2 has not been tested for this artifact. Therefore, for people using Docker Desktop (in Mac/Windows), we advise to turn of docker compose v2 features (see [here (bottom option)](https://docs.docker.com/desktop/mac/images/menu/prefs-general.png)).
+
 
 
 ## Building
 
 
-In order to build both parts of the artifact, run the following shell script in the top level directory of this package (note: it might be necessary to add executable permissions to the file): `build.sh`
+In order to build both parts of the artifact, run the following shell script in the top level directory of this package (note: it might be necessary to add executable permissions to the file): `./build.sh`
 
 Running the build script builds the Web Store microservices as separate docker images, builds a docker image for the A/B component and sets up the python 3 virtual environment used to simulate end-users in the Web Store application.
 
@@ -51,7 +53,7 @@ Running the build script builds the Web Store microservices as separate docker i
 ## Running
 
 
-To run the application, two scripts are provided: `start_web_store.sh` and `start_dashboard.sh`. Run both scripts sequentially one after another (first the Web Store script, then the dashboard script).
+To run the application, two scripts are provided: `./start_web_store.sh` and `./start_dashboard.sh`. Run both scripts sequentially one after another (first the Web Store script, then the dashboard script).
 
 The Web Store script deploys the microservice images as a docker stack on a local docker swarm node. Currently, the artifact has only been tested in a local setting. In future versions, we aim to test and support deploying the stack on multiple swarm nodes.
 
@@ -89,7 +91,7 @@ To monitor the pipeline after starting the feedback loop, navigate back to the `
 
 After testing the artifact, very little cleanup is necessary. First, make sure you stop the feedback loop using the Dashboard web interface (bottom of the `Run` tab). Afterwards you can safely stop the Managing System (stopping the running process).
 
-Lastly, run the `stop_web_store.sh` script. This script removes the deployed docker stack which contains the Web Store microservices.
+Lastly, run the `./stop_web_store.sh` script. This script removes the deployed docker stack which contains the Web Store microservices.
 
 
 
@@ -110,6 +112,7 @@ docker service rm ws-recommendation-service
 docker service rm ws-recommendation-service-1-0-0
 docker service rm ws-recommendation-service-1-1-0
 ```
+
 
 ### I am getting errors that the `source` command has not been found
 
