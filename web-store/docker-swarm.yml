@@ -245,7 +245,7 @@ services:
       dockerfile: nginx-service/Dockerfile
     image: nginx-service-image:latest
     ports: 
-      - 22:22
+      # - 22:22
       - 8080:80
     networks:
       custom-network:
