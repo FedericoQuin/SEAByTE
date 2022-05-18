@@ -181,7 +181,7 @@ details summary {
   /* margin-bottom: 10px; */
   /* vertical-align: auto; */
   vertical-align: middle;
-  font-size: 100%;
+  font-size: 110%;
   margin: 5px;
   padding-top: 5px;
 }
@@ -204,6 +204,16 @@ details[open] summary::before {
 details > p {
   margin-left: 20px;
   font-style: oblique;
+}
+
+details > div {
+  margin-left: 20px;
+  /* font-style: oblique; */
+  background-color: inherit;
+}
+
+details > div > div {
+  background-color: inherit;
 }
 
 

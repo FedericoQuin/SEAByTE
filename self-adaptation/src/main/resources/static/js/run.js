@@ -110,7 +110,11 @@ function addSetupCollapsible(rootElement, setup) {
               <div class="name bg-light-blue">${setup['name']}<div>
             </div>
           </summary>
-          <p style="margin-left: 20px;">Information about the setup in question</p><br>
+          <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">${['Name:', `${setup['name']}`, 
+          'Version A:', `${setup['versionA']['serviceName']} (image: ${setup['versionA']['imageName']})`, 
+          'Version B:', `${setup['versionB']['serviceName']} (image: ${setup['versionB']['imageName']})`,
+          'AB component:', `${setup['abcomponent']['serviceName']} (image: ${setup['abcomponent']['imageName']})`,
+          'Decommission:', `${setup['removeService']}`].map(x => `<div>${x}</div>`).join('\n')}</div>
         </details></div>`;
 }
 
@@ -130,10 +134,10 @@ window.populateExperiments = () => {
         if (response.status == 200) {
             let data = await response.json();
 
-            // TODO order alphabetically
+            // TODO order alphabetically?
             for (let experiment of data) {
                 const experimentName = experiment['name'];
-                addExperimentCollapsible(experiments, experimentName);
+                addExperimentCollapsible(experiments, experiment);
                 addExperimentForm(experimentName);
                 addInitialExperimentForm(experimentName);
             }
@@ -143,16 +147,26 @@ window.populateExperiments = () => {
 }
 
 
-function addExperimentCollapsible(rootElement, experimentName) {
+function addExperimentCollapsible(rootElement, experiment) {
     rootElement.innerHTML += `\n<div class="grid-item-margin">
         <details>
         <summary>
             <div class="steps bg-light-blue">
             <svg width="22" height="22"><image xlink:href="/svg/info.svg"/></svg>
-            <div class="name bg-light-blue">${experimentName}<div>
+            <div class="name bg-light-blue">${experiment['name']}<div>
             </div>
         </summary>
-        <p style="margin-left: 20px;">Information about the experiment in question</p><br>
+        <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">
+         ${['Name:', `${experiment['name']}`, 
+            'Variant A:', `${experiment['variantA']}`, 
+            'Variant B:', `${experiment['variantB']}`,
+            'AB weights:', `${experiment['absetting']['weightA']} (A) - ${experiment['absetting']['weightB']} (B)`,
+            'User profile:', `${experiment['userProfile']['name']} (${Object.entries(experiment['userProfile']['profiles']).map(x => x[1]).reduce((v1, v2) => v1 + v2, 0)} users in total)`,
+            'Metrics:', `${experiment['metrics'].join(', ')}`,
+            'Statistical test:', `${experiment['statisticalTest']['type']}`,
+            'P value: ', `${experiment['statisticalTest']['pvalue']}`,
+            'Samples: ', `${experiment['statisticalTest']['samples']}`]
+                .map(x => `<div>${x}</div>`).join('\n')}</div>
         </details></div>`;
 }
 
@@ -190,7 +204,7 @@ window.populateRules = () => {
             // TODO order alphabetically
             for (let rule of data) {
                 const ruleName = rule['name'];
-                addRuleCollapsible(rulesList, ruleName);
+                addRuleCollapsible(rulesList, rule);
                 addRuleForm(ruleName);
             }
         }
@@ -200,16 +214,21 @@ window.populateRules = () => {
 
 
 
-function addRuleCollapsible(rootElement, ruleName) {
+function addRuleCollapsible(rootElement, rule) {
     rootElement.innerHTML += `\n<div class="grid-item-margin">
         <details>
             <summary>
                 <div class="steps bg-light-blue">
                     <svg width="22" height="22"><image xlink:href="/svg/info.svg"/></svg>
-                    <div class="name bg-light-blue">${ruleName}<div>
+                    <div class="name bg-light-blue">${rule['name']}<div>
                 </div>
             </summary>
-            <p style="margin-left: 20px;">Information about the rule in question</p><br>
+            <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">
+            ${['Name:', `${rule['name']}`, 
+               'From experiment:', `${rule['fromExperiment']}`, 
+               'To experiment:', `${rule['toExperiment']}`,
+               'Conditions:', `${rule['conditions'].join('<br>')}`]
+                   .map(x => `<div>${x}</div>`).join('\n')}</div>
         </details></div>`;
 }
 
