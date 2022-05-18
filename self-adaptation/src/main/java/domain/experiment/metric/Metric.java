@@ -41,6 +41,7 @@ public abstract class Metric<T, U> {
     public abstract Predicate<URLRequest> filterFunction();
     public abstract Stream<T> extractRelevantDataAsStream(List<URLRequest> requests);
     public abstract Map<String, U> getExtraMetrics(List<URLRequest> requestsA, List<URLRequest> requestsB);
+    public abstract List<String> getExtraMetricNames();
     public abstract String getPlotDataTyped(List<T> requestsA, List<T> requestsB);
 
     public abstract String getInfoSummary(List<URLRequest> requests);

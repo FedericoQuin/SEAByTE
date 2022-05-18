@@ -59,7 +59,7 @@ public abstract class StatisticalTest<T> {
                 metric, e.getStackTrace())
             );
         } catch (ClassCastException e) {
-            throw new RuntimeException("The specified metrics for this statistical test do not match with the " +  
+            throw new RuntimeException("The specified metrics for this statistical test does not match with the " +  
                 "required data type used in the statistical test.");
         }
     }

@@ -35,6 +35,12 @@ public class ResponseTime extends Metric<Double, Double> {
     }
 
     @Override
+    public List<String> getExtraMetricNames() {
+        return List.of(String.format("mean(%s_A)", this.getName()), String.format("mean(%s_B)", this.getName()));
+    }
+
+
+    @Override
     public String getPlotDataTyped(List<Double> requestsA, List<Double> requestsB) {
         return String.format("{\"A\": [%s], \"B\": [%s], \"title\": \"%s\", \"type\": \"box\"}", 
             requestsA.stream()

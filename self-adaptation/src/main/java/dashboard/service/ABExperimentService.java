@@ -20,4 +20,8 @@ public class ABExperimentService {
     public Collection<Experiment<?>> getAllExperiments() {
         return repository.getAllExperiments();
     }
+
+    public Experiment<?> getExperiment(String name) {
+        return this.repository.getExperiment(name);
+    }
 }

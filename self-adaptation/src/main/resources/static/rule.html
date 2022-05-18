@@ -39,18 +39,30 @@
         <label for="nameRule">Name:</label>
         <input type="text" id="nameRule" name="nameRule"><br>
 
-        <label for="fromExperiment">From experiment:</label>
-        <input type="text" id="fromExperiment" name="fromExperiment"><br>
+        <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+          <div class="steps bg-gray"><label for="from-experiment">From experiment:</label></div>
+          <select id="from-experiment" name="from-experiment" onchange="getExperimentVariables(document.getElementById('from-experiment').value)">
+            <option selected disabled hidden>Select from experiment...</option>
+          </select>
+        </div>
 
-        <label for="toExperiment">To experiment:</label>
-        <input type="text" id="toExperiment" name="toExperiment"><br>
+
+        <!-- <label for="fromExperiment">From experiment:</label>
+        <input type="text" id="fromExperiment" name="fromExperiment"><br> -->
 
 
-        <label for="condition" title="e.g. result-stat != reject">Condition (left operand - operator - right operand):</label>
-        <div class="grid-container" style="grid-template-columns: 2fr 1fr 2fr;">
-          <div class="grid-item"><input type="text" id="conditionLeftOperand" name="conditionLeftOperand"></div>
-          <div class="grid-item"><input type="text" id="conditionOperator" name="conditionOperator"></div>
-          <div class="grid-item"><input type="text" id="conditionRightOperand" name="conditionRightOperand"></div>
+        <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+          <div class="steps bg-gray"><label for="to-experiment">To experiment:</label></div>
+          <select id="to-experiment" name="to-experiment">
+            <option selected disabled hidden>Select to experiment...</option>
+          </select>
+        </div>
+        <!-- <label for="toExperiment">To experiment:</label>
+        <input type="text" id="toExperiment" name="toExperiment"><br> -->
+
+
+        <label for="conditions" title="e.g. result-stat != reject">Conditions (type - left operand - operator - right operand):</label>
+        <div id="conditions" class="grid-container" style="grid-template-columns: 20fr 1fr;">
         </div>
 
         <input type="submit" class="green-button" id="submit-form-transition-rule" value="submit" action="javascript:void(0);">
@@ -65,6 +77,18 @@
 
 <section class="main-body">
 </section>
+
+
+
+
+<script>
+  window.onload = function() {
+    loadExperiments();
+  }
+</script>
+  
+
+
 </body>
 
 </html>

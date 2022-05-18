@@ -64,6 +64,13 @@ public class Purchases extends Metric<Boolean, Double> {
         );
     }
 
+    
+    @Override
+    public List<String> getExtraMetricNames() {
+        return List.of(String.format("mean(%s_A)", this.getName()), String.format("mean(%s_B)", this.getName()));
+    }
+
+
     @Override
     public String getPlotDataTyped(List<Boolean> requestsA, List<Boolean> requestsB) {
         return String.format("{\"positivesA\": %d, \"positivesB\": %d, \"negativesA\": %d, \"negativesB\": %d, \"positiveName\": \"%s\", \"negativeName\": \"%s\", \"title\": \"%s\", \"type\": \"bar\"}", 

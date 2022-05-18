@@ -31,13 +31,234 @@ function sendTransitionRuleToServer(transitionRule, form=null) {
 
 
 window.addTransitionRule = () => {
-    let form = document.getElementById('form-transition-rule');
-    const formData = new FormData(document.forms['form-transition-rule']);
+    const name = document.getElementById('nameRule').value;
+    const from = document.getElementById('from-experiment').value;
+    const to = document.getElementById('to-experiment').value;
 
-    sendTransitionRuleToServer(TransitionRule.constructFromForm(formData), form);
-    
+
+    if (!name) {
+        alert('Make sure to provide a name for the rule.');
+        return;
+    }
+
+    if (!from) {
+        alert('Make sure to provide a valid from experiment.');
+        return;
+    }
+
+    if (!to) {
+        alert('Make sure to provide a valid to experiment.');
+        return;
+    }
+
+
+    let conditions = [];
+
+    for (let condition of document.getElementsByName('condition')) {
+        const type = condition.querySelector('[name=rule-condition-type]').value;
+
+        if (type) {
+            const left = condition.querySelector('[name=conditionLeftOperand]').value;
+            const operator = condition.querySelector('[name=conditionOperator]').value;
+            const right = condition.querySelector('[name=conditionRightOperand]').value;
+
+            if (!left || !operator || !right) {
+                alert('Make sure all the provided conditions are complete.');
+                return;
+            }
+
+            conditions.push(new Condition(left, operator, right));
+        }
+        // ignore rule otherwise (empty)
+    }
+
+    sendTransitionRuleToServer(new TransitionRule(name, from, to, conditions));
+
+
+
+    let form = document.getElementById('form-transition-rule');
+    form.reset();
+    document.getElementById('conditions').innerHTML = '';
+
     return false;
 }
+
+
+window.getExperiments = () => {
+    fetch('/experiment/retrieve')
+        .then(response => response.json())
+        .then(data => {
+            let elemFrom = document.getElementById('from-experiment');
+            data.forEach(p => elemFrom.insertAdjacentHTML('beforeend', `<option value="${p.name}">${p.name}</option>`));
+            let elemTo = document.getElementById('to-experiment');
+            data.forEach(p => elemTo.insertAdjacentHTML('beforeend', `<option value="${p.name}">${p.name}</option>`));
+        })
+        .catch((error) => console.log(error));
+}
+
+
+// For now store this globally in memory here?
+class ExperimentVariables {
+    constructor(statisticalVariable, otherVariables) {
+        this.statisticalVariable = statisticalVariable;
+        this.otherVariables = otherVariables;
+    }
+}
+
+let variables = undefined;
+
+
+window.getExperimentVariables = (experimentName) => {
+    fetch(`/experiment/retrieveVariables?name=${experimentName}`)
+        .then(response => response.json())
+        .then(data => {
+            variables = new ExperimentVariables(data['statistical'], data['other']);
+            resetConditions();
+
+            // TODO add option to selection of transition rules with the appropriate type and available variables
+        })
+        .catch((error) => console.log(error));
+}
+
+function resetConditions() {
+    document.getElementById('conditions').innerHTML = `
+    <div class="grid-container" style="grid-template-columns: 4fr 4fr 2fr 4fr 1fr;" name="condition">
+        <div class="grid-item">
+            <select name="rule-condition-type" onchange="addAppropriateRuleVariablesForm(this)">
+                <option value="" selected disabled hidden>Select a rule condition type</option>
+                <option value="stat">Statistical</option>
+                <option value="reg">Regular</option>
+            </select>
+        </div>
+    </div>
+    <button class="add-field" type="button" onclick="addConditionField()" id="add-condition-field" style="visibility: hidden;">+</button>`;
+}
+
+
+window.loadExperiments = () => {
+    fetch('/experiment/retrieve')
+        .then(response => response.json())
+        
+        .then(data => {
+            const experimentNames = data.map(x => x['name']);
+            let fromElement = document.getElementById('from-experiment');
+            let toElement = document.getElementById('to-experiment');
+            for (let name of experimentNames) {
+                fromElement.insertAdjacentHTML('beforeend', `<option>${name}</option>`)
+                toElement.insertAdjacentHTML('beforeend', `<option>${name}</option>`)
+            }
+
+            toElement.insertAdjacentHTML('beforeend', '<option>end</option>');
+            // add to the selections
+        })
+        .catch(err => console.log(err));
+}
+
+
+
+
+
+window.addAppropriateRuleVariablesForm = (element) => {
+    if (variables == null) {
+        console.log("No experiment selected yet (or no variables found).");
+        return;
+    }
+
+    // console.log(variables);
+
+    // console.log(element);
+    // console.log(element.parentElement.parentElement);
+    const type = element.options[element.selectedIndex].value;
+    // console.log(type);
+
+
+    let varElement = element.parentElement.parentElement.querySelector('[name="conditionLeftOperand"]');
+    let nbOfRules = document.getElementsByName('condition').length;
+
+    if (!varElement) {
+        element.parentElement.insertAdjacentHTML('afterend', `
+        <div class="grid-item">
+            <select name="conditionLeftOperand">
+            <option selected disabled hidden>Select variable...</option>
+            </select>
+        </div>
+        <div class="grid-item">
+            <select name="conditionOperator">
+                <option selected disabled hidden>Select op...</option>
+            </select>
+        </div>
+        <div class="grid-item">
+            <select name="conditionRightOperand">
+                <option selected disabled hidden>Select value...</option>
+            </select>
+        </div>
+        ${nbOfRules > 1 ? '<button class="add-field" type="button" onclick="removeConditionField(this)" id="remove-condition-field">-</button>' : ''}
+        `);
+        
+        varElement = element.parentElement.parentElement.querySelector('[name="conditionLeftOperand"]');
+    }
+
+    let opElement = element.parentElement.parentElement.querySelector('[name="conditionOperator"]');
+    let rightElement = element.parentElement.parentElement.querySelector('[name="conditionRightOperand"]');
+
+    if (type == "stat") {
+        varElement.innerHTML = `\n<option value="" selected hidden disabled>Select variable...</option>
+        <option value="${variables.statisticalVariable}">${variables.statisticalVariable}</option>\n`;
+
+        opElement.innerHTML = `\n<option value="" selected hidden disabled>Select op...</option>
+        <option value="==">==</option>
+        <option value="!=">!=</option>\n`;
+
+        rightElement.innerHTML = `\n<option value="" selected hidden disabled>Select value...</option>
+        <option value="reject">Reject</option>
+        <option value="inconclusive">Inconclusive</option>\n`;
+        // document.replaceChild
+
+    } else if (type == "reg") {
+        varElement.innerHTML = `\n<option value="" selected hidden disabled>Select variable...</option>\n`;
+        rightElement.innerHTML = '\n<option value="" selected hidden disabled>Select value...</option>\n';
+
+        for (let variable of variables.otherVariables) {
+            varElement.insertAdjacentHTML('beforeend', `<option value="${variable}">${variable}</option>`);
+            rightElement.insertAdjacentHTML('beforeend', `<option value="${variable}">${variable}</option>`);
+        }
+
+        opElement.innerHTML = `\n<option value="" selected hidden disabled>Select op...</option>
+        <option value="==">==</option>
+        <option value="!=">!=</option>
+        <option value="<">&#60</option>
+        <option value="<=">&#60=</option>
+        <option value=">">&#62</option>
+        <option value=">=">&#62=</option>\n`;
+    }
+
+    document.getElementById('add-condition-field').style.visibility = 'visible';
+}
+
+
+window.addConditionField = () => {
+    document.getElementById('add-condition-field').insertAdjacentHTML('beforebegin', `
+        <div></div>
+          <div class="grid-container" style="grid-template-columns: 4fr 4fr 2fr 4fr 1fr;" name="condition">
+            <div class="grid-item">
+              <select name="rule-condition-type" onchange="addAppropriateRuleVariablesForm(this)">
+                <option value="" selected disabled hidden>Select a rule condition type</option>
+                <option value="stat">Statistical</option>
+                <option value="reg">Regular</option>
+              </select>
+            </div>
+        </div>
+    `);
+}
+
+window.removeConditionField = (button) => {
+    let parent = button.parentElement;
+    let prevSibling = parent.previousElementSibling;
+
+    parent.parentElement.removeChild(prevSibling);
+    parent.parentElement.removeChild(parent);
+}
+
 
 
     

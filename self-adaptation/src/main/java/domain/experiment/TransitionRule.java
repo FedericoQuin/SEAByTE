@@ -37,6 +37,11 @@ public class TransitionRule {
     }
 
 
+    public List<String> getConditions() {
+        return this.conditions.stream().map(ConditionTransitionRule::toString).toList();
+    }
+
+
     public <T extends Comparable<T>> boolean isSatisfied(Map<String, StatisticalResult> statVariables, 
             Map<String, T> extraVariables) {
         return conditions.stream()
@@ -68,6 +73,10 @@ public class TransitionRule {
                 return Arrays.stream(Operator.values())
                     .filter(o -> o.rep.equals(rep))
                     .findFirst().orElseThrow();
+            }
+
+            public String getRep() {
+                return this.rep;
             }
 
             public <T extends Comparable<T>> boolean execute(T first , T second) {
@@ -106,6 +115,12 @@ public class TransitionRule {
                 this.variableName1, this.variableName2));
             return false;
         }
+
+
+        @Override
+        public String toString() {
+            return String.format("%s %s %s", this.variableName1, this.operator.getRep(), this.variableName2);
+        }
     }
 
     public static class StatisticalConditionTransitionRule extends ConditionTransitionRule {
@@ -129,6 +144,11 @@ public class TransitionRule {
                 .severe(String.format("Required statistical variable '%s' not present in the provided map of variables.", 
                 this.variableName));
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s %s %s", this.variableName, this.operator.getRep(), this.result.name());
         }
     }
 
