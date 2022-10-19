@@ -26,8 +26,8 @@ Running the artifact first requires the installation of a few libraries. The fol
 
 - Java Runtime (17 or higher)
 - Maven (tested with version 3.8.4)
-- Docker (tested with version 20.10)
-- Docker-compose (tested with version 1.27.4, will be replaced by docker-compose v2 in future editions)
+- Docker (tested with version 20.10.20)
+- Docker-compose v2 (tested with version 2.12.0)
 - Python 3 (tested with 3.9.7)
 - Python 3 Virtual Environments (tested with 3.9.7)
 
