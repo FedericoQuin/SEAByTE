@@ -3,8 +3,6 @@ package dashboard.controller;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import com.google.gson.JsonParser;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.google.gson.JsonParser;
 
 import dashboard.service.ABSetupService;
 import domain.setup.Setup;
@@ -45,12 +45,19 @@ public class SetupController {
         return setupService.getAllSetups();
     }
 
+    @GetMapping(value="/images", produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Collection<String> getDockerImages() {
+        logger.info("Requested list of all available docker images.");
+        return setupService.getAvailableDockerImages();
+    }
+
 
     @PostMapping(value="/newSetup")
     @ResponseStatus(value=HttpStatus.OK)
     public void startNewSetup(@RequestBody String data) {
         var root = JsonParser.parseString(data).getAsJsonObject();
 
+        // TODO verify that the specified images are present in the docker repository?
         String name = root.get("name").getAsString();
         Setup setup = new Setup(name,
             new NewService(root.get("versionA").getAsJsonObject().get("serviceName").getAsString(),

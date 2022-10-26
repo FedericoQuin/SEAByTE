@@ -25,6 +25,7 @@ public abstract class Command {
         }
         result.waitFor();
 
+        System.out.println(resultString);
         return resultString;
     }
 }
