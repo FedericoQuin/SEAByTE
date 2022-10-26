@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 public class RetrieveAvailableImages extends Command {
     private static final String COMMAND_STRING = 
-        "docker image ls --format '{{.Repository}}'";
+        "docker image ls --format '{{.Repository}}:{{.Tag}}'";
 
     private Logger logger = Logger.getLogger(RetrieveAvailableImages.class.getName());
 
