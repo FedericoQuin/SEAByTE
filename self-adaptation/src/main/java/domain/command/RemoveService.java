@@ -1,6 +1,7 @@
 package domain.command;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public class RemoveService extends Command {
@@ -15,7 +16,7 @@ public class RemoveService extends Command {
     }
 
 
-    public void execute() { 
+    public Optional<String> execute() { 
         try {
             String command = String.format(COMMAND_TEMPLATE, this.serviceName);
             logger.info(command);
@@ -23,5 +24,6 @@ public class RemoveService extends Command {
         } catch (IOException | InterruptedException e) {
             logger.severe(e.getMessage());
         }
+        return Optional.empty();
     }
 }

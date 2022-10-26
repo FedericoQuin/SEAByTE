@@ -1,6 +1,7 @@
 package domain.command;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 
@@ -30,7 +31,7 @@ public class InitiateService extends Command {
         this(serviceName, baseDockerImage, networkPort, networkName, 1);
     }
 
-    public void execute() {
+    public Optional<String> execute() {
         try {
             String command = String.format(COMMAND_TEMPLATE, 
                 this.serviceName, this.amtInstances, this.networkPort, this.networkName, this.baseDockerImage);
@@ -39,5 +40,6 @@ public class InitiateService extends Command {
         } catch (IOException | InterruptedException e) {
             logger.severe(e.getMessage());
         }
+        return Optional.empty();
     }
 }
