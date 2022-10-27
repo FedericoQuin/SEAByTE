@@ -35,6 +35,21 @@ function sendSetupToServer(setup, form=null) {
 }
 
 
+function populateDockerImages() {
+    fetch("/setup/images", {method: 'get'})
+        .then(response => response.json())
+        .then(images => {
+            let elemComA = document.getElementById('commission-A-image')
+            images.forEach(p => elemComA.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
+            let elemComB = document.getElementById('commission-B-image')
+            images.forEach(p => elemComB.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
+            let elemComAB = document.getElementById('ab-component-image')
+            images.forEach(p => elemComAB.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
+        })
+        .catch(error => console.error(error))
+}
+
+
 window.sendCustomSetup = () => {
     let form = document.getElementById('form-setup');
     const formData = new FormData(document.forms['form-setup']);
@@ -51,4 +66,8 @@ window.addDefaultSetup = () => {
         new DockerService('ws-recommendation-service', 'ab-component-image:latest'),
         'ws-recommendation-service'
     ));
+}
+
+window.initializeWindow = () => {
+    let images = populateDockerImages();
 }

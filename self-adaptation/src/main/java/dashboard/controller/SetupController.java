@@ -57,7 +57,6 @@ public class SetupController {
     public void startNewSetup(@RequestBody String data) {
         var root = JsonParser.parseString(data).getAsJsonObject();
 
-        // TODO verify that the specified images are present in the docker repository?
         String name = root.get("name").getAsString();
         Setup setup = new Setup(name,
             new NewService(root.get("versionA").getAsJsonObject().get("serviceName").getAsString(),

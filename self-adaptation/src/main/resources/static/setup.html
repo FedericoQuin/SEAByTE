@@ -44,15 +44,21 @@
         <div class="grid-container" style="grid-template-columns: 1fr 2fr 2fr;">
           <div class="grid-item steps bg-gray"><label>Version A:</label></div>
           <div class="grid-item"><input type="text" id="commission-A-container" name="commission-A-container"></div>
-          <div class="grid-item"><input type="text" id="commission-A-image" name="commission-A-image"></div>
+          <select id="commission-A-image" name="commission-A-image">
+            <option selected disabled hidden>Select docker image...</option>
+          </select>
 
           <div class="grid-item steps bg-gray"><label>Version B:</label></div>
           <div class="grid-item"><input type="text" id="commission-B-container" name="commission-B-container"></div>
-          <div class="grid-item"><input type="text" id="commission-B-image" name="commission-B-image"></div>
+          <select id="commission-B-image" name="commission-B-image">
+            <option selected disabled hidden>Select docker image...</option>
+          </select>
 
-          <div class="grid-item steps bg-gray"><label>AB component:</label></div>
+          <div class="grid-item steps bg-gray"><label>A/B Component:</label></div>
           <div class="grid-item"><input type="text" id="ab-component-container" name="ab-component-container"></div>
-          <div class="grid-item"><input type="text" id="ab-component-image" name="ab-component-image"></div>
+          <select id="ab-component-image" name="ab-component-image">
+            <option selected disabled hidden>Select docker image...</option>
+          </select>
         </div>
 
         <label for="decommission">Decommission (service name):</label>
@@ -70,6 +76,14 @@
 
 <section class="main-body">
 </section>
+
+
+
+<script>
+  window.onload = function() {
+    initializeWindow();
+  }
+  </script>
 </body>
 
 </html>
