@@ -37,6 +37,9 @@ public class ABSetupService {
             .map(Arrays::stream)
             .orElse(Stream.empty())
             .map(s -> s.replace("'", ""))
+            // Remove nameless images, and nameless versions of images
+            .filter(s -> !s.equals("<none>:<none>"))
+            .map(s -> s.replace(":<none>", ""))
             .toList();
     }
 }

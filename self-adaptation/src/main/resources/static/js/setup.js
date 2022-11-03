@@ -39,6 +39,7 @@ function populateDockerImages() {
     fetch("/setup/images", {method: 'get'})
         .then(response => response.json())
         .then(images => {
+            images.sort();
             let elemComA = document.getElementById('commission-A-image')
             images.forEach(p => elemComA.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
             let elemComB = document.getElementById('commission-B-image')
