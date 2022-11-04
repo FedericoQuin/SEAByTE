@@ -22,7 +22,8 @@ public class ReviewService {
 
 
 	
-	public void addReview(UUID reviewId, UUID userId,UUID itemId, String review,Integer rating) {
+	public void addReview(UUID userId,UUID itemId, String review,Integer rating) {
+		UUID reviewId = UUID.randomUUID();
 		this.repository.save(new Review(reviewId,userId,itemId,review,rating));
 	}
 
@@ -31,23 +32,25 @@ public class ReviewService {
 		var review = this.repository.findById(reviewId);
 
 		return review;
-		
-		// return this.repository.findById(userId).orElseGet(() -> {
-		// 	if (!initializeIfAbsent) {
-		// 		return Optional.empty();
-		// 	}
-		// 	UserBasket basket = new UserBasket(userId);
-		// 	this.repository.save(basket);
-		// 	return basket;
-		// }));
+
 	}
 
-	public Collection<Review> getReviewsAsCollection(UUID itemId) {
+	public Collection<Review> getReviewsAsCollectionForItem(UUID itemId) {
 		return this.repository.findAll().stream().filter(r -> r.getItemId().equals(itemId)).collect(Collectors.toList());
 	}
 
+	public Collection<Review> getReviewsAsCollectionForUser(UUID userId) {
+		return this.repository.findAll().stream().filter(r -> r.getUserId().equals(userId)).collect(Collectors.toList());
+	}
+
 	public boolean hasReview(UUID userId, UUID itemId) {
-		return this.getReviewsAsCollection(itemId).stream().anyMatch(r -> r.getUserId()==userId);
+		return this.getReviewsAsCollectionForItem(itemId).stream().anyMatch(r -> r.getUserId()==userId);
+	}
+
+	public void changeReview(UUID reviewId, String reviewText, Integer rating){
+		var review = this.repository.findById(reviewId).get();
+		review.updateReview(reviewText,rating);
+		this.repository.save(review);
 	}
 
 

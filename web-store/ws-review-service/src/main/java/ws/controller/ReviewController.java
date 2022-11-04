@@ -30,18 +30,32 @@ public class ReviewController {
 
 
 
-	@GetMapping(value="/{id}", produces=MediaType.APPLICATION_JSON_VALUE)
-	public Collection<Review> getReviews(@PathVariable UUID id) {
+	@GetMapping(value="/item/{id}", produces=MediaType.APPLICATION_JSON_VALUE)
+	public Collection<Review> getReviewsForItem(@PathVariable UUID id) {
 		logger.info(String.format("Requested reviews of item with ID=%s", id.toString()));
-		return service.getReviewsAsCollection(id);
+		return service.getReviewsAsCollectionForItem(id);
+	}
+
+	@GetMapping(value="/user/{id}", produces=MediaType.APPLICATION_JSON_VALUE)
+	public Collection<Review> getReviewsForUser(@PathVariable UUID id) {
+		logger.info(String.format("Requested reviews of user with ID=%s", id.toString()));
+		return service.getReviewsAsCollectionForUser(id);
 	}
 
 	@PostMapping(value="/add", produces=MediaType.APPLICATION_JSON_VALUE)
-	public void addReviewToProduct(@CookieValue(name="user-id") UUID id, @RequestBody(required = false) ReviewItem item) {
+	public void addReviewToProduct(@CookieValue(name="user-id") UUID id, @RequestBody(required = true) ReviewItem item) {
 
-			service.addReview(item.reviewId, id, item.itemId(), item.review(),item.rating());
+			service.addReview(id, item.itemId(), item.review(), item.rating());
 		
 	}
 
+	@PostMapping(value="/append", produces=MediaType.APPLICATION_JSON_VALUE)
+	public void appendtoExistingReview(@CookieValue(name="user-id") UUID id, @RequestBody(required = true) CorrectionItem item) {
+		if (service.getReviewsAsCollectionForUser(id).stream().anyMatch(r -> r.getReviewId().equals(item.reviewId())))
+		service.changeReview( item.reviewId(), item.review(), item.rating());
+
+	}
+
 	public record ReviewItem(UUID reviewId, UUID itemId, String review, Integer rating) {}
+	public record CorrectionItem(UUID reviewId, String review, Integer rating) {}
 }

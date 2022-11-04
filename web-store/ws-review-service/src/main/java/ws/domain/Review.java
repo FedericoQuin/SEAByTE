@@ -59,8 +59,9 @@ public class Review {
 	public Integer getRating(){return rating;}
 
 
-	public void updateReview(String addition) {
+	public void updateReview(String addition, Integer rating) {
 		this.review += addition;
+		this.rating = rating;
 	}
 
 }
