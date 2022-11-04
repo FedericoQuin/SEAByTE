@@ -60,6 +60,7 @@ public class Review {
 
 
 	public void updateReview(String addition, Integer rating) {
+		this.review += "\n appendix: \n";
 		this.review += addition;
 		this.rating = rating;
 	}

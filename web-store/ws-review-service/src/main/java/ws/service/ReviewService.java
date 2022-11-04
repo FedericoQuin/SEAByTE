@@ -44,7 +44,7 @@ public class ReviewService {
 	}
 
 	public boolean hasReview(UUID userId, UUID itemId) {
-		return this.getReviewsAsCollectionForItem(itemId).stream().anyMatch(r -> r.getUserId()==userId);
+		return this.getReviewsAsCollectionForItem(itemId).stream().anyMatch(r -> r.getUserId().equals(userId));
 	}
 
 	public void changeReview(UUID reviewId, String reviewText, Integer rating){
