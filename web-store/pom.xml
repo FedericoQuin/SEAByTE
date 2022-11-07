@@ -169,6 +169,7 @@
 				<module>ws-pricing-service</module>
 				<module>ws-user-service</module>
 				<module>ws-basket-service</module>
+				<module>ws-review-service</module>
 				<module>ws-checkout-service</module>
 				<module>ws-history-service</module>
 				<module>ws-recommendation-service</module>

@@ -1,3 +1,6 @@
 .vscode
 *.zip
 *.tar
+
+.idea/vcs.xml
+.idea/workspace.xml

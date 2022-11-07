@@ -165,6 +165,29 @@ services:
     networks:
       - custom-network
 
+  ws-review-service:
+    build:
+      context: .
+      dockerfile: ws-review-service/Dockerfile
+      args:
+        VERSION: ${VERSION}
+    image: ws-review-service-image:${VERSION}
+    depends_on:
+      - ws-registration-service
+      - ws-review-mongo
+    ports:
+      - 80
+    networks:
+      - custom-network
+    deploy:
+      replicas: ${WS_REVIEW_AMT_INSTANCES}
+
+
+  ws-review-mongo:
+    image: mongo
+    networks:
+      - custom-network
+
 
   ws-checkout-service:
     build: 

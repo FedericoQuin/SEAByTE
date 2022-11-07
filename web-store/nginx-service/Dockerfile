@@ -26,6 +26,7 @@ CMD ./wait-for-it.sh -t 60 ws-webapp-service:80 -- \
 	./wait-for-it.sh -t 10 ws-pricing-service:80 -- \
 	./wait-for-it.sh -t 10 ws-user-service:80 -- \
 	./wait-for-it.sh -t 10 ws-basket-service:80 -- \
+	./wait-for-it.sh -t 10 ws-review-service:80 -- \
 	./wait-for-it.sh -t 10 ws-checkout-service:80 -- \
 	./wait-for-it.sh -t 10 ws-history-service:80 -- \
 	./wait-for-it.sh -t 10 ws-recommendation-service:80 -- \
