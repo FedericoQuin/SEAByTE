@@ -1,24 +1,23 @@
 package domain.experiment;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserProfile {
     private String name;
-    private Map<String, Integer> userProfiles;
-    private Map<String, String> extraProperties;
+    private List<LocustUser> userProfiles;
 
 
     public UserProfile(String name, String locustUserName, int amount) {
-        this(name, Map.of(locustUserName, amount), new HashMap<>());
+        this(name, List.of(new LocustUser(locustUserName, amount, new HashMap<>())));
     }
 
-    public UserProfile(String name, Map<String, Integer> locustUsers, Map<String, String> extraProperties) {
+    public UserProfile(String name, List<LocustUser> locustUsers) {
         this.name = name;
         this.userProfiles = locustUsers;
-        this.extraProperties = extraProperties;
     }
 
 
@@ -28,14 +27,12 @@ public class UserProfile {
 
     @JsonIgnore
     public int getNumberOfUsers() {
-        return this.userProfiles.values().stream().reduce(0, Integer::sum);
+        return this.userProfiles.stream().mapToInt(LocustUser::numberOfUsers).reduce(0, Integer::sum);
     }
 
-    public Map<String, Integer> getProfiles() {
+    public List<LocustUser> getLocustUsers() {
         return this.userProfiles;
     }
 
-    public Map<String, String> getExtraProperties() {
-        return this.extraProperties;
-    }
+    public record LocustUser(String name, int numberOfUsers, Map<String, String> extraProperties) {}
 }

@@ -15,6 +15,7 @@ import dashboard.service.ABExperimentService;
 import dashboard.service.ABRunService;
 import dashboard.service.ABSetupService;
 import dashboard.service.AdaptationService;
+import dashboard.service.UserProfileService;
 
 @SpringBootApplication()
 public class Dashboard {
@@ -23,7 +24,7 @@ public class Dashboard {
 		System.setProperty("spring.config.name", "dashboard-config");
 
 		SpringApplication.run(Dashboard.class, args);
-		Logger.getLogger(Dashboard.class.getName()).setLevel(Level.ALL);;
+		Logger.getLogger(Dashboard.class.getName()).setLevel(Level.ALL);
 	}
 
 
@@ -55,6 +56,10 @@ public class Dashboard {
 		return new AdaptationService();
 	}
 
+	@Bean
+	public UserProfileService UserProfileService() {
+		return new UserProfileService();
+	}
 
 
 	@Bean

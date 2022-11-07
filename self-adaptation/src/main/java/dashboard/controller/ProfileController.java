@@ -1,11 +1,9 @@
 package dashboard.controller;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import com.google.gson.JsonParser;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 import dashboard.model.ABRepository;
+import dashboard.service.UserProfileService;
+import dashboard.service.UserProfileService.LocustProfileInfo;
 import domain.experiment.UserProfile;
+import domain.experiment.UserProfile.LocustUser;
 
 @Controller
 @RequestMapping("/profile")
@@ -28,6 +32,9 @@ public class ProfileController {
 
     @Autowired
     private ABRepository repository;
+
+    @Autowired
+    private UserProfileService userProfileService;
 
 
 
@@ -45,12 +52,21 @@ public class ProfileController {
 
         var root = JsonParser.parseString(data).getAsJsonObject();
 
+        // var sharedVars = root.get("sharedVars").getAsJsonObject().entrySet().stream()
+        //     .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getAsString()));
+
         UserProfile profile = new UserProfile(
             root.get("name").getAsString(),
-            root.get("locustUsers").getAsJsonObject().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getAsInt())),
-            root.get("extraVars").getAsJsonObject().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getAsString()))
+            StreamSupport.stream(root.get("locustUsers").getAsJsonArray().spliterator(), true)
+                .map(JsonElement::getAsJsonObject)
+                .map(o -> new LocustUser(o.get("locustUser").getAsString(), 
+                        o.get("numberOfUsers").getAsInt(),
+                        StreamSupport.stream(o.get("environmentVars").getAsJsonArray().spliterator(), true)
+                            .map(JsonElement::getAsJsonObject)
+                            .collect(Collectors.toMap(p -> p.get("variableName").getAsString(), 
+                                p -> p.get("variableValue").getAsString()))
+                ))
+                .toList()
         );
 
         repository.addUserProfile(profile);
@@ -59,6 +75,13 @@ public class ProfileController {
     @GetMapping(value="/retrieve")
     public @ResponseBody Collection<UserProfile> getExperiments() {
         return repository.getAllUserProfiles();
-    } 
-    
+    }
+
+
+    @GetMapping(value="/locustProfiles")
+    public @ResponseBody Collection<LocustProfileInfo> getLocustProfilesInformation() {
+        return userProfileService.getLocustProfilesInformation();
+    }
+
+    // record LocustUser(String locustUser, int numberOfUsers, Map<String, String> environmentVariables) {}
 }
