@@ -161,7 +161,7 @@ function addExperimentCollapsible(rootElement, experiment) {
             'Variant A:', `${experiment['variantA']}`, 
             'Variant B:', `${experiment['variantB']}`,
             'AB weights:', `${experiment['absetting']['weightA']} (A) - ${experiment['absetting']['weightB']} (B)`,
-            'User profile:', `${experiment['userProfile']['name']} (${Object.entries(experiment['userProfile']['profiles']).map(x => x[1]).reduce((v1, v2) => v1 + v2, 0)} users in total)`,
+            'User profile:', `${experiment['userProfile']['name']} (${(experiment['userProfile']['locustUsers']).map(x => x['numberOfUsers']).reduce((v1, v2) => v1 + v2, 0)} users in total)`,
             'Metrics:', `${experiment['metrics'].join(', ')}`,
             'Statistical test:', `${experiment['statisticalTest']['type']}`,
             'P value: ', `${experiment['statisticalTest']['pvalue']}`,

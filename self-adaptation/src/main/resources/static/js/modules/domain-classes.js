@@ -89,21 +89,26 @@ export class Experiment {
 }
 
 
+export class EnvironmentVariable {
+    constructor(variableName, variableValue) {
+        this.variableName = variableName;
+        this.variableValue = variableValue;
+    }
+}
+
+export class LocustUser {
+    constructor(locustUser, numberOfUsers, environmentVars) {
+        this.locustUser = locustUser;
+        this.numberOfUsers = numberOfUsers;
+        this.environmentVars = environmentVars;
+    }
+}
+
 export class UserProfile {
-    constructor(name, locustUsers, extraVars) {
+    constructor(name, locustUsers) {
         this.name = name;
         this.locustUsers = locustUsers;
-        this.extraVars = extraVars;
     }
-
-    // static constructFromForm(formData, extraVariables) {
-    //     return new UserProfile(
-    //         formData.get('nameProfile'),
-    //         formData.get('locustUser'),
-    //         Number.parseInt(formData.get('numberOfUsers')),
-    //         extraVariables
-    //     );
-    // }
 }
 
 
