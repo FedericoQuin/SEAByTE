@@ -1,0 +1,10 @@
+users:
+  - 
+      name: "RegularUser"
+      description: "A regular user that makes purchases in the web-store."
+      requiredVariables:
+        # - "UserIdLimitA"
+        - "clickChanceA"
+        - "clickChanceB"
+        - "purchaseChanceA"
+        - "purchaseChanceB"

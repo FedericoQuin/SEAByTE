@@ -1,24 +1,25 @@
 
+from typing import Sequence
+from UserTemplate import UserTemplate
 import locust
 import random
 import uuid
 import time
 import json
-import os
 from Static import AVAILABLE_CLIENT_IDS, ITEMS
 
 
-class RegularUser(locust.HttpUser):
+class RegularUser(UserTemplate):
     wait_time = locust.between(5, 15)
 
     def on_start(self):
         self.clientId = AVAILABLE_CLIENT_IDS.pop()
         self.cookies = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
         
-        version = 'A' if self.clientId <= int(os.environ.get('UserIdLimitA')) else 'B'
+        version = 'A' if self.clientId <= int(self.getEnvironmentVariable('UserIdLimitA')) else 'B'
             
-        self.chanceClickRec = float(os.environ.get(f'clickChance{version}'))
-        self.chanceBuyRec = float(os.environ.get(f'purchaseChance{version}'))
+        self.chanceClickRec = float(self.getEnvironmentVariable(f'clickChance{version}'))
+        self.chanceBuyRec = float(self.getEnvironmentVariable(f'purchaseChance{version}'))
 
         if len(ITEMS) == 0:
             raise RuntimeError('No items are present in the system, aborting...')

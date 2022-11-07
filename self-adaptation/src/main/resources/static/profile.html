@@ -39,14 +39,17 @@
         <label for="nameProfile">Name:</label>
         <input type="text" id="nameProfile" name="nameProfile"><br>
 
-        <label for=users>Locust users:</label><br>
+        <div id="profiles"></div>
+        
+        
+        <!-- <label for=users>Locust users:</label><br>
         <div class="grid-container" style="grid-template-columns: 9fr 1fr;">
           <div class="grid-container" name="profile-user" style="grid-template-columns: 2fr 1fr;">
             <input type="text" name="profile-user-name" placeholder="name">
             <input type="number" name="profile-user-number" placeholder="number of users">
           </div>
           <button class="add-field" type="button" onclick="addUserField()" id="add-user-field">+</button>
-        </div>
+        </div> -->
 
 
         <!-- <label for="locustUser">Locust user:</label>
@@ -57,14 +60,14 @@
             <input type="number" id="numberOfUsers" name="numberOfUsers" placeholder="number of users">
         </div> -->
 
-        <label for="variables">Extra variables:</label><br>
+        <!-- <label for="variables">Extra shared variables:</label><br>
         <div class="grid-container" style="grid-template-columns: 9fr 1fr;">
           <div class="grid-container" name="profile-variable" style="grid-template-columns: 1fr 1fr;">
             <input type="text" name="profile-variable-name" placeholder="variable name">
             <input type="text" name="profile-variable-value" placeholder="variable value">
           </div>
           <button class="add-field" type="button" onclick="addVariableField()" id="add-variable-field">+</button>
-        </div>
+        </div> -->
 
 
         <input style="margin-top: 20px;" type="submit" class="green-button" id="submit-form-user-profile" value="submit" action="javascript:void(0);">
@@ -95,6 +98,10 @@ function addVariableField() {
     <input type="text" name="profile-variable-name" placeholder="variable name">
     <input type="text" name="profile-variable-value" placeholder="variable value">
   </div>`);
+}
+
+window.onload = function() {
+  init();
 }
 </script>
 

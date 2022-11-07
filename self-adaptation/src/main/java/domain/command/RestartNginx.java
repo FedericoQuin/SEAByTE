@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 
@@ -24,7 +25,7 @@ public class RestartNginx extends Command {
         this.password = password;
     }
 
-    public void execute() {
+    public Optional<String> execute() {
         // ansible-playbook nginx_restart.yml --extra-vars "user=%s host=%s"
         try {
             File file = new File(String.format("%s/hosts.ini", ANSIBLE_PATH));
@@ -52,5 +53,7 @@ public class RestartNginx extends Command {
         } catch (IOException | InterruptedException e) {
             logger.severe(e.getMessage());
         }
+
+        return Optional.empty();
     }
 }

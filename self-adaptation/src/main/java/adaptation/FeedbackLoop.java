@@ -150,24 +150,25 @@ public class FeedbackLoop {
 
 
 
-        var profiles = currentExperiment.getUserProfile().getProfiles();
-        var locustProperties = currentExperiment.getUserProfile().getExtraProperties();
+        var locustUsers = currentExperiment.getUserProfile().getLocustUsers();
         int totalAmountUsers = currentExperiment.getUserProfile().getNumberOfUsers();
         int weightA = currentExperiment.getABSetting().getWeightA();
         int middlePoint = (int) (weightA * totalAmountUsers / 100.0);
         int currentIndex = 1;
 
 
-        for (var entry : profiles.entrySet()) {
-            int nrUsersA = (int) Math.floor(entry.getValue() * (weightA / 100.0));
+        for (var user : locustUsers) {
+            int nrUsersA = (int) Math.floor(user.numberOfUsers() * (weightA / 100.0));
 
-            this.locustRunners.add(new LocustRunner(entry.getKey(), nrUsersA, currentIndex, middlePoint, locustProperties));
+            this.locustRunners.add(new LocustRunner(user.name(), nrUsersA, currentIndex, middlePoint, 
+                    user.extraProperties()));
             currentIndex += nrUsersA;
         }
-        for (var entry : profiles.entrySet()) {
-            int nrUsersB = (int) Math.ceil(entry.getValue() * ((100 - weightA) / 100.0));
+        for (var user : locustUsers) {
+            int nrUsersB = (int) Math.ceil(user.numberOfUsers() * ((100 - weightA) / 100.0));
 
-            this.locustRunners.add(new LocustRunner(entry.getKey(), nrUsersB, currentIndex, middlePoint, locustProperties));
+            this.locustRunners.add(new LocustRunner(user.name(), nrUsersB, currentIndex, middlePoint, 
+                    user.extraProperties()));
             currentIndex += nrUsersB;
         }
 

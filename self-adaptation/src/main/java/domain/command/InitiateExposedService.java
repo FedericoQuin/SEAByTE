@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class InitiateExposedService extends Command {
     }
 
 
-    public void execute() {
+    public Optional<String> execute() {
         try {
             String command = String.format(COMMAND_TEMPLATE, 
                 this.serviceName,
@@ -48,6 +49,7 @@ public class InitiateExposedService extends Command {
         } catch (IOException | InterruptedException e) {
             logger.severe(e.getMessage());
         }
+        return Optional.empty();
     }
 
 

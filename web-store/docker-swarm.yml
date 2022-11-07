@@ -18,8 +18,6 @@ services:
       args:
         VERSION: ${VERSION}
     image: ws-registration-service-image:${VERSION}
-    depends_on:
-      - main-dependency-image
     ports:
       - 80
     networks:
@@ -37,7 +35,6 @@ services:
     image: ws-webapp-service-image:${VERSION}
     depends_on: 
       # aware that this dependency is still suboptimal, does not wait until eureka server has actually started
-      - main-dependency-image
       - ws-registration-service
     ports:
       - 80
@@ -54,7 +51,6 @@ services:
         VERSION: ${VERSION}
     image: ws-inventory-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-inventory-mongo
     ports:
@@ -79,7 +75,6 @@ services:
         VERSION: ${VERSION}
     image: ws-login-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-accounts-mongo
     ports:
@@ -104,7 +99,6 @@ services:
         VERSION: ${VERSION}
     image: ws-pricing-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-pricing-mongo
     ports:
@@ -131,7 +125,6 @@ services:
         VERSION: ${VERSION}
     image: ws-user-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-user-mongo
     ports:
@@ -157,7 +150,6 @@ services:
         VERSION: ${VERSION}
     image: ws-basket-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-basket-mongo
     ports:
@@ -181,7 +173,6 @@ services:
         VERSION: ${VERSION}
     image: ws-review-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-review-mongo
     ports:
@@ -206,7 +197,6 @@ services:
         VERSION: ${VERSION}
     image: ws-checkout-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
     ports:
       - 80
@@ -225,7 +215,6 @@ services:
         VERSION: ${VERSION}
     image: ws-history-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
       - ws-history-mongo
     ports:
@@ -250,7 +239,6 @@ services:
         VERSION: ${VERSION}
     image: ws-recommendation-service-image:${VERSION}
     depends_on:
-      - main-dependency-image
       - ws-registration-service
     ports:
       - 80

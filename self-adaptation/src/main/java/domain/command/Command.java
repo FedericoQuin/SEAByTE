@@ -4,9 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
 
 public abstract class Command {
-    public abstract void execute();
+    public abstract Optional<String> execute();
 
 
     public static String executeCommand(String command) throws IOException, InterruptedException {
