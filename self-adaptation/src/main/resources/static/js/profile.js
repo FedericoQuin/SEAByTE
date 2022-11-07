@@ -11,7 +11,6 @@ window.init = () => {
         .then(response => response.json())
         .then(data => {
             availableProfiles = data;
-            availableProfiles.push({name:"Testing", description:"Testing profile", requiredVariables: ["var1", "var2"]})
             resetLocustUsers();
         })
         .catch(error => console.log(error));
