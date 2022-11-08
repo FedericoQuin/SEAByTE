@@ -7,6 +7,7 @@ import yaml
 
 class UserTemplate(locust.HttpUser):
     # NOTE: make sure to add any newly developed user profiles in the file: 'UserManifest.yml'
+    abstract=True
     
     def getRequiredEnvironmentVariables(self) -> Sequence[str]:
         if not hasattr(self, 'requiredVariables'):
@@ -22,11 +23,11 @@ class UserTemplate(locust.HttpUser):
                 if not any(instanceClassName == u['name'] for u in data['users']):
                     raise Exception(f'User profile "{instanceClassName}" is not specified in the user manifest file.')
                 
-                for userProfile in data['users']['name']:
-                    if instanceClassName == userProfile:
-                        self.description = userProfile[instanceClassName]['description']
+                for userProfile in data['users']:
+                    if instanceClassName == userProfile['name']:
+                        self.description = userProfile['description']
                         # UserIdLimitA is provided by default when locust users are started from the dashboard
-                        self.requiredVariables = userProfile[instanceClassName]['requiredVariables'] + ['UserIdLimitA']
+                        self.requiredVariables = userProfile['requiredVariables'] + ['UserIdLimitA']
                         break
             
         return self.requiredVariables
