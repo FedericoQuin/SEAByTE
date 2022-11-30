@@ -12,4 +12,4 @@ fi
 export $(grep -v '^#' .env | xargs -d '\n')
 
 echo "Running web-store with version tag $VERSION"
-docker stack deploy -c docker-swarm.yml $(echo WS-$VERSION | sed "s/\./\-/g")
+docker stack deploy -c docker-swarm.yml WS

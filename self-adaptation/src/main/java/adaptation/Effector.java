@@ -5,17 +5,21 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import domain.command.Command;
+import domain.command.RetrieveRunningServices;
+import domain.setup.Setup.NewService;
 import util.Networking;
 
 public class Effector implements IEffector {
 
     private FeedbackLoop feedbackLoop;
-
+    private NewService removedService;
+    
     private Logger logger = Logger.getLogger(Effector.class.getName());
     
 
     public Effector(FeedbackLoop feedbackLoop) {
         this.feedbackLoop = feedbackLoop;
+        this.removedService = null;
     }
 
 
@@ -63,6 +67,25 @@ public class Effector implements IEffector {
         int exposedPort = Networking.generateAvailableNetworkPort();
         var commands = setup.generateCommands(exposedPort);
 
+        String services = new RetrieveRunningServices().execute().get();
+
+        // Look for the service that corresponds to the service that will be removed
+        for (String service : services.split("\n")) {
+            if (!service.contains("\t")) {
+                continue;
+            }
+
+            String name = service.split("\t")[0].replace("WS_", "");
+            String image = service.split("\t")[1];
+
+            if (name.equals(setup.getRemoveService())) {
+                logger.info(String.format("Found a match of service that will be removed: %s | %s", name, image));
+                this.removedService = new NewService(setup.getRemoveService(), image);
+                break;
+            }
+        }
+
+
         logger.info(String.format("Executing %d commands...", commands.size()));
         
         try {
@@ -79,6 +102,11 @@ public class Effector implements IEffector {
     @Override
     public void removeSetup(String setupName) {
         var setup = this.feedbackLoop.getKnowledge().getSetup().get();
-        setup.generateReverseCommands().forEach(Command::execute);
+
+        logger.info("Attempting to restart stopped service...");
+        var commands = this.removedService == null ? setup.generateReverseCommands() : setup.generateReverseCommands(this.removedService);
+        commands.forEach(Command::execute);
+
+        this.removedService = null;
     }
 }

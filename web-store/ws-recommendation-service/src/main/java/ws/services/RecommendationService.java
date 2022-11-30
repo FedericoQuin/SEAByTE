@@ -21,7 +21,7 @@ public class RecommendationService {
 	private Logger logger = Logger.getLogger(RecommendationService.class.getName());
 
 	public Collection<Recommendation> generateRecommendations(HttpServletRequest req) {
-		var cookies = Arrays.asList(req.getCookies());
+		var cookies = req.getCookies() == null ? List.<Cookie>of() : Arrays.asList(req.getCookies());
 		// Take the three most popular purchased products
 		var historyItems = WebClient.create().get()
 			.uri("ws-history-service/history/recent?limit=1000")
@@ -63,7 +63,7 @@ public class RecommendationService {
 
 	public Collection<Recommendation> generateRecommendations(UUID userId, HttpServletRequest req) {
 		// Look at the contents of the users basket before making recommendations
-		var cookies = Arrays.asList(req.getCookies());
+		var cookies = req.getCookies() == null ? List.<Cookie>of() : Arrays.asList(req.getCookies());
 
 		var items = this.getHistoryAndBasket(userId, cookies).block();
 		var basket = Arrays.stream(items.basketItems).collect(Collectors.toMap(i -> i.itemId, i -> i.amount));

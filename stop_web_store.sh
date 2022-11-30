@@ -1,3 +1,16 @@
 # !/bin/bash
 
-docker stack rm WS-1-0-0
+
+for SERVICE in $(docker service ls --format {{.Name}})
+do
+    if [[ $SERVICE == WS_* || $SERVICE == ws-* ]];
+    then
+        docker service rm ${SERVICE}
+    fi
+done
+
+docker stack rm WS
+
+
+
+

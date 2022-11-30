@@ -2,6 +2,7 @@ package domain.setup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import domain.Constants;
 import domain.command.Command;
@@ -67,7 +68,7 @@ public class Setup {
         commands.add(new InitiateService(serviceB.serviceName(), serviceB.imageName(), 80, Constants.WS_NETWORK));
 
         // Decommission the existing service
-        commands.add(new RemoveService(String.format("WS-1-0-0_%s", decommission)));
+        commands.add(new RemoveService(decommission));
         
         // Add the new service that overlapped with the older one
         // In our case this is the AB-component service
@@ -83,16 +84,27 @@ public class Setup {
         
         return commands;
     }
-
+    
+    
+    
     public List<Command> generateReverseCommands() {
-        // TODO also respawn the originally removed service --> requires the original image
-        // Remove all the spawned services
-
+        // Remove all spawned services
         return List.of(
             new RemoveService(this.getVersionA().serviceName()),
             new RemoveService(this.getVersionB().serviceName()),
             new RemoveService(this.getABComponent().serviceName())
         );
+    }
+
+
+
+    public List<Command> generateReverseCommands(NewService reinstatedService) {
+        // Add the original docker service that was removed at the A/B test setup
+        return Stream.concat(
+                this.generateReverseCommands().stream(), 
+                Stream.of(new InitiateService(reinstatedService.serviceName(), reinstatedService.imageName(), 
+                    80, Constants.WS_NETWORK)))
+            .toList();
     }
     
  

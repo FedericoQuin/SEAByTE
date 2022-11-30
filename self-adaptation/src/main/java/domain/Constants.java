@@ -13,7 +13,7 @@ public class Constants {
     private static String DOCKER_CONNECT_STRING = "docker network connect %s %s";
 
 
-    public static String WS_NETWORK = "WS-1-0-0_custom-network";
+    public static String WS_NETWORK = "WS_custom-network";
 
 
 
