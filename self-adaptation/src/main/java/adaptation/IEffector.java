@@ -27,7 +27,6 @@ public interface IEffector {
 
     /**
      * Reverse the deployment of a Setup in the AB application.
-     * NOTE: this method does currently not restore the original microservice that was decommisioned
      * @param setupName The name of the setup to be undeployed.
      */
     void removeSetup(String setupName);

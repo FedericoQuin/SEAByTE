@@ -8,8 +8,7 @@ public class Experiment<T> {
     
     private String name;
 
-    private String nameVariantA;
-    private String nameVariantB;
+    private String setup;
 
     private UserProfile userProfile;
     
@@ -20,11 +19,10 @@ public class Experiment<T> {
     private StatisticalTest<T> statisticalTest;
     
 
-    public Experiment(String name, String variantA, String variantB, ABSetting setting, 
+    public Experiment(String name, String setup, ABSetting setting, 
             UserProfile userProfile, List<String> metrics, StatisticalTest<T> test) {
         this.name = name;
-        this.nameVariantA = variantA;
-        this.nameVariantB = variantB;
+        this.setup = setup;
         this.userProfile = userProfile;
         this.abSetting = setting;
         this.metrics = metrics;
@@ -35,12 +33,8 @@ public class Experiment<T> {
         return this.name;
     }
 
-    public String getVariantA() {
-        return this.nameVariantA;
-    }
-
-    public String getVariantB() {
-        return this.nameVariantB;
+    public String getSetup() {
+        return this.setup;
     }
 
     public UserProfile getUserProfile() {

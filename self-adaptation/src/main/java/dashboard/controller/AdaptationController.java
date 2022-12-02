@@ -5,14 +5,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.google.gson.JsonParser;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.gson.JsonParser;
 
 import adaptation.FeedbackLoop;
 import adaptation.Knowledge.WorkflowStep;
@@ -65,11 +65,10 @@ public class AdaptationController {
         this.logger.info("Starting the feedback loop.");
 
         var root = JsonParser.parseString(data).getAsJsonObject();
-        String setupName = root.get("setup").getAsString();
 
-        List<String> experiments = new ArrayList<>();
+        List<String> experimentNames = new ArrayList<>();
         root.get("experiments").getAsJsonArray()
-            .forEach(e -> experiments.add(e.getAsString()));
+            .forEach(e -> experimentNames.add(e.getAsString()));
 
         List<String> rules = new ArrayList<>();
         root.get("transitionRules").getAsJsonArray()
@@ -77,9 +76,15 @@ public class AdaptationController {
 
         String initialExperiment = root.get("initialExperiment").getAsString();
 
-        this.feedbackLoop.initializeFeedbackLoop(repository.getSetup(setupName),
-            // Hacky way to get around the type system in java
-            (List<Experiment<?>>)(List<?>) experiments.stream().map(repository::getExperiment).toList(), 
+        // Hacky way to get around the type system in java
+        var experiments = (List<Experiment<?>>)(List<?>) experimentNames.stream().map(repository::getExperiment).toList();
+
+        this.feedbackLoop.initializeFeedbackLoop(
+            experiments.stream()
+                .map(Experiment::getSetup)
+                .map(s -> repository.getSetup(s))
+                .toList(),
+            experiments, 
             rules.stream().map(repository::getTransitionRule).toList(),
             initialExperiment);
 

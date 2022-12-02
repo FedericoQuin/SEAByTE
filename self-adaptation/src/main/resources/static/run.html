@@ -65,14 +65,6 @@
 
     <div class="grid-container" style="gap: 10px; margin: 40px 5px 5px 5px; width: 50%;">
       <!-- <button type="button" onclick="runDefaultSetup();">Run default setup</button><br> -->
-      
-      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">  
-        <label class="steps run-label">Setup: </label>
-        <select id="setupName" name="setupName">
-          <option selected disabled hidden>Select setup...</option>
-        </select>
-      </div>
-
 
       <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
         <label class="run-label" style="padding-bottom: 23px;">Experiments:</label>
@@ -89,12 +81,10 @@
       <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
         <label class="steps run-label">Initial experiment:</label>
         <select id="initialExperiment" name="initialExperiment">
-          <option selected disabled hidden>Select initial experiment...</option>
+          <option selected disabled hidden value="">Select initial experiment...</option>
         </select>
       </div>
       
-      <!-- <input type="text" id="setupName" value="" style="width: 20%; margin: 5px 10px 5px 10px;"> -->
-      <!-- <button type="button" onclick="runSetup(document.getElementById('setupName').value);">Run setup</button> -->
       <div style="margin-top: 20px"><button class="green-button" type="button" onclick="startFeedbackLoop();">Start feedback loop</button></div>
     </div>
 

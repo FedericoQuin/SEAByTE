@@ -66,18 +66,13 @@ public class FeedbackLoop {
         return this.isActive;
     }
 
-    public void initializeFeedbackLoop(Setup setup, 
+    public void initializeFeedbackLoop(List<Setup> setups, 
             List<Experiment<?>> experiments,
             List<TransitionRule> rules, 
             String initialExperiment) {
-                
-        // Handling the setup
-        knowledge.setSetup(setup);
-        knowledge.setABComponentName(setup.getABComponent().serviceName());
-
-        int port = this.effector.deploySetup(setup.getName());
-        knowledge.setExposedPort(port, setup.getABComponent().serviceName());
-        knowledge.addToHistory(new WorkflowStep("Setup", setup.getName()));
+        
+        // Handling the setups
+        knowledge.addSetups(setups);
 
         // Handling the experiments
         knowledge.addExperiments(experiments);
@@ -101,7 +96,7 @@ public class FeedbackLoop {
 
 
     public Optional<Setup> getDeployedSetup() {
-        return this.knowledge.getSetup();
+        return this.knowledge.getCurrentSetup();
     }
 
     public Optional<Experiment<?>> getCurrentExperiment() {
@@ -121,11 +116,53 @@ public class FeedbackLoop {
         return this.knowledge.getRequestsB();
     }
 
+    private void startSetup(Setup setup) {
+        // Handling the setup
+        knowledge.setCurrentSetup(setup);
+        knowledge.setABComponentName(setup.getABComponent().serviceName());
+
+        int port = this.effector.deploySetup(setup.getName());
+        knowledge.setExposedPort(port, setup.getABComponent().serviceName());
+        knowledge.addToHistory(new WorkflowStep("Setup", setup.getName()));
+    }
+
+    private void stopSetup() {
+        this.knowledge.getCurrentExperiment().ifPresent(s -> {
+            this.effector.removeSetup(s.getName());
+            this.knowledge.setCurrentSetup(null);
+            this.knowledge.setABComponentName(null);
+            this.knowledge.removeExposedPort(s.getName());
+        });
+    }
+
     /**
      * Prepare the feedback loop and the underlying MAPE components for a new experiment
      */
     public void startExperiment() {
         var currentExperiment = this.knowledge.getCurrentExperiment().get();
+
+        Setup experimentSetup = this.knowledge.getSetups().stream()
+            .filter(s -> s.getName().equals(currentExperiment.getSetup()))
+            .findFirst().orElseThrow();
+
+
+        this.knowledge.getCurrentSetup()
+            // .filter(s -> s.equals(experimentSetup))
+            .ifPresentOrElse(s -> {
+                // A setup is deployed, check if it matches the one we need for the new experiment
+                if (!s.equals(experimentSetup)) {
+                    // Remove the setup and deploy the new one
+                    this.stopSetup();
+                    this.startSetup(experimentSetup);
+                }
+                // Otherwise no action needs to be taken - correct setup is already deployed
+            }, () -> {
+                // No setup deployed yet --> deploy the new one
+                this.startSetup(experimentSetup);
+            });
+
+
+
         this.knowledge.addToHistory(new WorkflowStep("Experiment", currentExperiment.getName()));
         this.knowledge.clearSamples();
 
@@ -205,8 +242,7 @@ public class FeedbackLoop {
         this.monitor.stopPolling();
         this.isActive = false;
         
-        knowledge.getSetup()
-            .ifPresent(s -> this.effector.removeSetup(s.getName()));
+        this.stopSetup();
 
         if (!keepKnowledge) {
             this.knowledge.reset();

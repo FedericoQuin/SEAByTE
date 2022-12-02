@@ -19,7 +19,7 @@ public class AdaptationService {
         }
         var knowledge = feedbackLoop.getKnowledge();
 
-        return knowledge.getSetup();
+        return knowledge.getCurrentSetup();
     }
 
 }

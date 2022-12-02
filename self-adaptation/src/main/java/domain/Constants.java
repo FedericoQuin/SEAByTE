@@ -14,6 +14,7 @@ public class Constants {
 
 
     public static String WS_NETWORK = "WS_custom-network";
+    public static String STACK_NAME = "WS_";
 
 
 

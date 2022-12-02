@@ -10,21 +10,23 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class InitiateExposedService extends Command {
-    private static String COMMAND_TEMPLATE = 
-        "docker service create --name %s --replicas %d %s %s --network %s %s";
+    private static final String COMMAND_TEMPLATE = 
+        "docker service create --name %s --hostname %s --replicas %d %s %s --network %s %s";
     
-    private String serviceName;
-    private int amtInstances;
-    private String networkName;
-    private String baseDockerImage;
-    private List<DockerPort> ports;
-    private Map<String, String> environmentVariables;
+    private final String serviceName;
+    private final String hostName;
+    private final int amtInstances;
+    private final String networkName;
+    private final String baseDockerImage;
+    private final List<DockerPort> ports;
+    private final Map<String, String> environmentVariables;
 
     private Logger logger = Logger.getLogger(InitiateExposedService.class.getName());
 
 
     private InitiateExposedService(InitiateExposedServiceBuilder builder) {
         this.serviceName = builder.serviceName;
+        this.hostName = builder.hostName;
         this.amtInstances = builder.amtInstances;
         this.networkName = builder.networkName;
         this.baseDockerImage = builder.baseDockerImage;
@@ -37,6 +39,7 @@ public class InitiateExposedService extends Command {
         try {
             String command = String.format(COMMAND_TEMPLATE, 
                 this.serviceName,
+                this.hostName,
                 this.amtInstances,
                 this.ports.stream().map(DockerPort::generateDockerCmdFlag).collect(Collectors.joining(" ")),
                 this.environmentVariables.entrySet().stream()
@@ -74,14 +77,16 @@ public class InitiateExposedService extends Command {
 
     public static class InitiateExposedServiceBuilder {
         private String serviceName;
+        private String hostName;
         private int amtInstances;
         private String networkName;
         private String baseDockerImage;
         private List<DockerPort> ports;
         private Map<String, String> environmentVariables;
 
-        public InitiateExposedServiceBuilder(String serviceName, String baseDockerImage, String networkName) {
+        public InitiateExposedServiceBuilder(String serviceName, String hostName, String baseDockerImage, String networkName) {
             this.serviceName = serviceName;
+            this.hostName = hostName;
             this.baseDockerImage = baseDockerImage;
             this.networkName = networkName;
             

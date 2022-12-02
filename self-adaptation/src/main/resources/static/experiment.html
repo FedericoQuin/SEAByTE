@@ -40,11 +40,13 @@
       <form name="form-experiment" id="form-experiment" onsubmit="return publishExperiment()" action="javascript: void(0);">
         <label for="nameExperiment">Name:</label>
         <input type="text" id="nameExperiment" name="nameExperiment"><br>
-
-        <label for="variant-A">Variant A:</label>
-        <input type="text" id="variant-A" name="variant-A"><br>
-        <label for="variant-B">Variant B:</label>
-        <input type="text" id="variant-B" name="variant-B"><br>
+        
+        <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
+          <div class="steps bg-gray"><label for="setup">Setup:</label></div>
+          <select id="setup" name="setup">
+            <option selected disabled hidden>Select setup...</option>
+          </select>
+        </div>
 
         <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
           <div class="steps bg-gray"><label for="user-profile">User profile:</label></div>
@@ -106,6 +108,7 @@
 <script>
 window.onload = function() {
   getProfiles();
+  getSetups();
 }
 </script>
 </body>

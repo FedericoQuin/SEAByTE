@@ -57,10 +57,9 @@ export class ABAssignment {
 
 
 export class Experiment {
-    constructor(name, variantA, variantB, userProfile, samples, abAssignment, metrics, statisticalTest) {
+    constructor(name, setup, userProfile, samples, abAssignment, metrics, statisticalTest) {
         this.name = name;
-        this.variantA = variantA;
-        this.variantB = variantB;
+        this.setup = setup;
         this.userProfile = userProfile;
         this.samples = samples;
         this.abAssignment = abAssignment;
@@ -72,8 +71,7 @@ export class Experiment {
     static constructFromForm(formData) {
         return new Experiment(
             formData.get('nameExperiment'),
-            formData.get('variant-A'),
-            formData.get('variant-B'),
+            formData.get('setup'),
             formData.get('user-profile'),
             formData.get('samples'),
             new ABAssignment(formData.get('a-assignment'), formData.get('b-assignment')),

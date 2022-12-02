@@ -23,6 +23,12 @@ window.publishExperiment = () => {
         window.alert('Make sure a proper user profile is selected.')
         return;
     }
+    
+    // Similar check for the setup
+    if (!formData.get("setup")) {
+        window.alert('Make sure a proper setup is selected.');
+        return;
+    }
 
     addExperimentToServer(Experiment.constructFromForm(formData));
 
@@ -42,11 +48,24 @@ window.getProfiles = () => {
 
 
 
+window.getSetups = () => {
+    fetch('/setup/retrieve')
+        .then(response => response.json())
+        .then(data => {
+            let elem = document.getElementById('setup');
+            data.forEach(p => elem.insertAdjacentHTML('beforeend', `<option value="${p.name}">${p.name}</option>`));
+        })
+        .catch((error) => console.log(error));
+}
+
+
+
+
+
 window.publishDefaultExperiments = () => {
     addExperimentToServer(new Experiment(
         'Upgrade v1.0.0 - v1.1.0',
-        'ws-recommendation-service-1-0-0',
-        'ws-recommendation-service-1-1-0',
+        'Recommendation_upgrade',
         'Standard',
         100,
         new ABAssignment(50, 50),
@@ -62,8 +81,7 @@ window.publishDefaultExperiments = () => {
 
     addExperimentToServer(new Experiment(
         'Clicks v1.0.0 - v1.1.0',
-        'ws-recommendation-service-1-0-0',
-        'ws-recommendation-service-1-1-0',
+        'Recommendation_upgrade',
         'Standard',
         100,
         new ABAssignment(30, 70),
@@ -79,8 +97,7 @@ window.publishDefaultExperiments = () => {
 
     addExperimentToServer(new Experiment(
         'Purchases v1.0.0 - v1.1.0',
-        'ws-recommendation-service-1-0-0',
-        'ws-recommendation-service-1-1-0',
+        'Recommendation_upgrade',
         'Standard',
         100,
         new ABAssignment(20, 80),

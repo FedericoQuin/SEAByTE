@@ -158,8 +158,7 @@ function addExperimentCollapsible(rootElement, experiment) {
         </summary>
         <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">
          ${['Name:', `${experiment['name']}`, 
-            'Variant A:', `${experiment['variantA']}`, 
-            'Variant B:', `${experiment['variantB']}`,
+            'Setup:', `${experiment['setup']}`, 
             'AB weights:', `${experiment['absetting']['weightA']} (A) - ${experiment['absetting']['weightB']} (B)`,
             'User profile:', `${experiment['userProfile']['name']} (${(experiment['userProfile']['locustUsers']).map(x => x['numberOfUsers']).reduce((v1, v2) => v1 + v2, 0)} users in total)`,
             'Metrics:', `${experiment['metrics'].join(', ')}`,
@@ -248,7 +247,6 @@ function addRuleForm(ruleName) {
 
 
 window.startFeedbackLoop = () => {
-    const setupName = document.getElementById('setupName').value;
     const selectedExperiments = Array.from(document.getElementsByName('experiments'))
         .filter(c => c.checked)
         .map(c => c.value);
@@ -257,15 +255,14 @@ window.startFeedbackLoop = () => {
         .map(c => c.value);
     const initialExperimentName = document.getElementById('initialExperiment').value;
 
-    if (!setupName) {
-        updateStatus('Make sure a setup name is specified.');
+    if (!initialExperimentName) {
+        updateStatus('Make sure am initial experiment is specified.');
         return;
     }
     (async () => {
-        updateStatusWithDefaultLoader(`Starting feedback loop with setup '${setupName}'...`, COLORS.STATUS_LABEL_COLOR_PENDING);
+        updateStatusWithDefaultLoader(`Starting feedback loop with experiment '${initialExperimentName}'...`, COLORS.STATUS_LABEL_COLOR_PENDING);
         const f = await fetch('adaptation/start', 
             {method: 'post', body: JSON.stringify({
-                setup: setupName,
                 experiments: selectedExperiments,
                 transitionRules: rules,
                 initialExperiment: initialExperimentName

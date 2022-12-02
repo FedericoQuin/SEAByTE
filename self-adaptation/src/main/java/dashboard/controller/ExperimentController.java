@@ -4,10 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -18,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
 import dashboard.model.ABRepository;
 import dashboard.service.ABExperimentService;
@@ -121,8 +121,7 @@ public class ExperimentController {
         
         Experiment<?> experiment = new Experiment<>(
             root.get("name").getAsString(),
-            root.get("variantA").getAsString(),
-            root.get("variantB").getAsString(),
+            root.get("setup").getAsString(),
             new ABSetting(
                 root.get("abAssignment").getAsJsonObject().get("weightA").getAsInt(),
                 root.get("abAssignment").getAsJsonObject().get("weightB").getAsInt()

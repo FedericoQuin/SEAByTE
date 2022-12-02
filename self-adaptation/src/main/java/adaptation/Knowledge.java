@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import domain.URLRequest;
 import domain.URLRequest.ABInstance;
@@ -27,17 +29,21 @@ public class Knowledge {
     // The network ports exposed on the local machine for each AB component (AB component name -> network port)
     private Map<String, Integer> abComponentPort;
 
-    // The setup that has to be executed before deploying the feedback loop
-    private Setup setup;
+
+    // The current setup that is deployed in the system
+    private Setup currentSetup;
+
+    // The setups available to be executed before starting an experiment
+    private Set<Setup> setups;
 
     // The experiment that is currently being conducted
     private Experiment<?> currentExperiment;
 
-    // A complete list of all experiments the feedback loop can (has) to go through
-    private List<Experiment<?>> experiments;
+    // A complete set of all experiments the feedback loop can (has) to go through
+    private Set<Experiment<?>> experiments;
 
-    // The list of all transition rules to transition between different experiments
-    private List<TransitionRule> transitionRules;
+    // The set of all transition rules to transition between different experiments
+    private Set<TransitionRule> transitionRules;
 
 
     // Temporary result of the statistical test conducted in the current experiment
@@ -56,8 +62,20 @@ public class Knowledge {
         this.reset();
     }
 
-    public void setSetup(Setup setup) {
-        this.setup = setup;
+    public void setCurrentSetup(Setup setup) {
+        this.currentSetup = setup;
+    }
+
+    public Optional<Setup> getCurrentSetup() {
+        return Optional.ofNullable(currentSetup);
+    }
+
+    public void addSetups(Collection<Setup> setups) {
+        this.setups.addAll(setups);
+    }
+
+    public Collection<Setup> getSetups() {
+        return this.setups;
     }
 
     public int getABComponentPort(String abComponentName) {
@@ -68,10 +86,10 @@ public class Knowledge {
         return this.abComponentName;
     }
 
-
-    public Optional<Setup> getSetup() {
-        return Optional.ofNullable(setup);
+    public void removeExposedPort(String abComponentName) {
+        this.abComponentPort.remove(abComponentName);
     }
+
 
 
     public void addRequests(Collection<URLRequest> requests, ABInstance instance) {
@@ -123,7 +141,7 @@ public class Knowledge {
     }
 
 
-    public List<TransitionRule> getTransitionRules() {
+    public Set<TransitionRule> getTransitionRules() {
         return this.transitionRules;
     }
 
@@ -181,13 +199,14 @@ public class Knowledge {
         this.abComponentName = null;
         this.abComponentPort = new HashMap<>();
 
-        this.setup = null;
+        this.currentSetup = null;
         this.currentExperiment = null;
         this.nextExperimentName = null;
         this.statisticalResult = null;
-        this.experiments = new ArrayList<>();
+        this.setups = new HashSet<>();
+        this.experiments = new HashSet<>();
 
-        this.transitionRules = new ArrayList<>();
+        this.transitionRules = new HashSet<>();
         this.history = new ArrayList<>();
     }
 
