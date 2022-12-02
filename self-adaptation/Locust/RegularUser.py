@@ -55,7 +55,7 @@ class RegularUser(UserTemplate):
         # roll for chance of viewing recommended items
         chanceClick = random.random()
         
-        chosenItem = recommendations[random.randrange(0, len(recommendations))]
+        chosenItem = recommendations[random.randrange(0, len(recommendations))]['itemId']
         
         
         if chanceClick <= self.chanceClickRec:
