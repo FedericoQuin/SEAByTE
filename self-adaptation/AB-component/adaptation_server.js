@@ -294,15 +294,13 @@ const requestListener = function (req, res) {
         client_id = client_id_cookie[0][1];
     }
 
-    const client_group =""
-
     if (!state.hasClient(client_id)) {
         // Add the client-id to one of the scenarios
         let promise = state.addClient(client_id);
-        promise.then(()=>{pass_internal_request(req, client_id);}).catch(error => console.info(error.message));
+        promise.then(()=>{pass_internal_request(req, h, has_client_id, client_id, res);}).catch(error => console.info(error.message));
     }
     else{
-        pass_internal_request(req, client_id);
+        pass_internal_request(req, h, has_client_id, client_id,res);
     }
 
     
@@ -312,9 +310,9 @@ const requestListener = function (req, res) {
     
 }
 
-function pass_internal_request(req, client_id){
+function pass_internal_request(req, h, has_client_id, client_id,res){
     const client_group = state.getGroup(client_id);
-        h['cookie'] += `; scenario${client_group.name}_${AB_COMPONENT_NAME}=true`;
+    h['cookie'] += `; scenario${client_group.name}_${AB_COMPONENT_NAME}=true`;
     // `http://localhost:${PORT}${req.url}`,
 
     
