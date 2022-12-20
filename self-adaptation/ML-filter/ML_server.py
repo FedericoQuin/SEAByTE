@@ -6,13 +6,17 @@ import math
 import requests
 import random
 from enum import Enum
+import os
+import sys
 
 PORT = 80
-AB_COMPONENT_NAME = 'test' #process.env.AB_COMPONENT_NAME;
+AB_COMPONENT_NAME = os.environ.get('AB_COMPONENT_NAME')
+historyA = []
+historyB = []
+last_client_id = 0
 
 
 app = Flask(__name__)
-
 class Variant(Enum):
     A = 'A'
     B = 'B'
@@ -118,16 +122,40 @@ class ABState:
             c.group = assignmentFunction.determineAssignment(c.id)
         # A and B assigment happens based on the receiver limit of users that are going to connect to the system
 
+class TimingRequest():
+    def __init__(self, duration, clientId, url):
+        self.duration = duration
+        self.clientId = clientId
+        self.requestedUrl = url   
+
+
 
 state = ABState()
 
+@app.route("/variant")
+def select_variant():
+    global last_client_id
+    while (state.hasClient(last_client_id)):
+        last_client_id += 1
+    client_id = last_client_id
+    ##Append the newly created client ID to the cookie header such that the client stores and uses it in subsequent requests
+        
+    if not state.hasClient(client_id):
+        state.addClient(client_id)
+    client_group = state.getGroup(client_id)
+    
+    response = Response(client_group.name, mimetype="text/plain")
+    return response
 
-@app.route("/recommendation")
+
+
+
+"""@app.route("/recommendation")
 def select_ab_test():
     try:
         client_id = request.cookies['client-id']
     except:
-        last_client_id = 1
+        global last_client_id
         while (state.hasClient(last_client_id)):
             last_client_id += 1
         client_id = last_client_id
@@ -136,7 +164,24 @@ def select_ab_test():
     if not state.hasClient(client_id):
         state.addClient(client_id)
     client_group = state.getGroup(client_id)
-    response = Response()
+    
+    new_url = f'http://localhost:{PORT}{request.path}'
+    new_method= request.method
+    new_headers =request.headers
+    new_headers['cookie']
+    internal_response = requests.request(new_method, new_url, headers=new_headers)
+    
+    data = ''
+    global historyA
+    global historyB
+    
+    if client_group == Variant.A :
+                historyA.append(TimingRequest(internal_response.elapsed, client_id, internal_response.url))
+    elif client_group == Variant.B :
+                historyB.append(TimingRequest(internal_response.elapsed, client_id, internal_response.url))
+        
+
+    response = Response(internal_response.json)
     response.set_cookie(f"scenario{client_group.name}_{AB_COMPONENT_NAME}",'true')
     response.set_cookie('client-id',str(client_id))
     
@@ -145,17 +190,52 @@ def select_ab_test():
     
         
 
-@app.route("/recommendation/adaptation/")
-def adaptation_listenen():
-    try:
-        test = request.cookies.get('userID')
-    except:
-        response= make_response()
+@app.route("/recommendation/adaptation/history")
+def adaptation_history_listenen():
+    variant = request.args.get('variant')
+    if variant is None:
+        response = Response()
+        response.end('No variant specified.')
+        response.statusCode = 400
+        return response
+    history = historyA if variant == Variant.A.name else historyB if variant == Variant.B.name else undefined
 
-
+    response = Response(str(history))
+    if request.args.get('removeAfter') is not None:
+        history.clear()
+    return response
+    
 
     
-    internal_request = requests.get("http://localhost:${PORT}${req.url}")
+@app.route("/recommendation/adaptation/change")
+def adaptation_change_listenen():
+    
+    weight_a = int(request.args.get(Variant.A.name))
+    weight_b = int(request.args.get(Variant.B.name))
 
+    if (weight_a + weight_b != 100):
+        response = Response(f'Invalid weights for A and B: does not add up to a total sum of 100 (sum={weight_a+weight_b}).', status=400)
+        return response
+    userLimit = request.args.get('userLimit')
+    if userLimit is not None:
+        userLimit = int(userLimit)
+        state.adjustWeightsWithCustomAssignment(weight_a, weight_b, userLimit)
+        response = Response(f'Adjusted A/B weights of this AB component to {weight_a} and {weight_b} with custom assignment function.')
+        return response
+    else:
+        state.adjustWeights(weight_a, weight_b)
+        response = Response(f'Adjusted A/B weights of this AB component to {weight_a} and {weight_b}.')
+        return response
+        
+
+@app.route("/recommendation/adaptation/reset")
+def adaptation_reset_listenen():
+    historyA.clear()
+    historyB.clear()
+    last_client_id = 0
+    state.clearClients()
+    response = Response('Done.')
+    return response
+"""
 
         
