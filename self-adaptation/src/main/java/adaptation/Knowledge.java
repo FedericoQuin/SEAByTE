@@ -9,14 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import domain.ABComponent;
 import domain.URLRequest;
 import domain.URLRequest.ABInstance;
 import domain.experiment.Experiment;
 import domain.experiment.StatisticalTest.StatisticalResult;
 import domain.experiment.TransitionRule;
 import domain.experiment.UserProfile;
+import domain.pipeline.Pipeline;
 import domain.setup.Setup;
+import domain.split.PopulationSplit;
 
 public class Knowledge {
 
@@ -44,6 +48,14 @@ public class Knowledge {
 
     // The set of all transition rules to transition between different experiments
     private Set<TransitionRule> transitionRules;
+
+
+    // The set of all population splits
+    private Set<PopulationSplit> populationSplits;
+
+
+    // The set of pipelines
+    private Set<Pipeline> pipelines;
 
 
     // Temporary result of the statistical test conducted in the current experiment
@@ -187,7 +199,31 @@ public class Knowledge {
         return this.history;
     }
 
+    public void addPopulationSplit(PopulationSplit populationSplit) {
+        this.populationSplits.add(populationSplit);
+    }
 
+    public void addPopulationSplits(Collection<PopulationSplit> populationSplits) {
+        populationSplits.forEach(this::addPopulationSplit);
+    }
+
+    public PopulationSplit getPopulationSplit(String name) {
+        return this.populationSplits.stream().filter(s -> s.getName().equals(name)).findFirst().orElseThrow();
+    }
+
+
+
+    public void addPipeline(Pipeline pipeline) {
+        this.pipelines.add(pipeline);
+    }
+
+    public void addPipelines(Collection<Pipeline> pipelines) {
+        pipelines.forEach(this::addPipeline);
+    }
+
+    public Pipeline getPipeline(String name) {
+        return this.pipelines.stream().filter(p -> p.getName().equals(name)).findFirst().orElseThrow();
+    }
 
 
     // Reset the knowledge to the default state
@@ -207,7 +243,17 @@ public class Knowledge {
         this.experiments = new HashSet<>();
 
         this.transitionRules = new HashSet<>();
+        this.populationSplits = new HashSet<>();
+        this.pipelines = new HashSet<>();
         this.history = new ArrayList<>();
+    }
+
+
+
+    public ABComponent getComponent(String name) {
+        return Stream.concat(this.experiments.stream(), this.populationSplits.stream())
+            .filter(c -> c.getName().equals(name))
+            .findFirst().orElseThrow();
     }
 
 

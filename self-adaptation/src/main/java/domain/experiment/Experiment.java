@@ -2,13 +2,22 @@ package domain.experiment;
 
 import java.util.List;
 
-import domain.ABSetting;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Experiment<T> {
+import adaptation.FeedbackLoop;
+import domain.ABComponent;
+import domain.ABSetting;
+import domain.command.Command;
+import domain.setup.Setup;
+
+public class Experiment<T> implements ABComponent {
     
     private String name;
 
     private String setup;
+
+    @JsonIgnore
+    private Setup deployedSetup;
 
     private UserProfile userProfile;
     
@@ -27,6 +36,7 @@ public class Experiment<T> {
         this.abSetting = setting;
         this.metrics = metrics;
         this.statisticalTest = test;
+        this.deployedSetup = null;
     }
 
     public String getName() {
@@ -51,5 +61,27 @@ public class Experiment<T> {
 
     public StatisticalTest<T> getStatisticalTest() {
         return this.statisticalTest;
+    }
+
+
+    @JsonIgnore
+    public List<Command> getStartCommands(Setup setup, int networkPort) {
+        this.deployedSetup = setup;
+        return this.deployedSetup.generateCommands(networkPort);
+    }
+
+    @Override
+    @JsonIgnore
+    public List<Command> getStopCommands() {
+        if (this.deployedSetup != null) {
+            return this.deployedSetup.generateReverseCommandsWithReboot();
+        }
+
+        return List.of();
+    }
+
+    @Override
+    public void handleComponentInPipeline(FeedbackLoop feedbackLoop) {
+        feedbackLoop.handleComponent(this);
     }
 }

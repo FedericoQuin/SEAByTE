@@ -1,15 +1,17 @@
 package dashboard.controller;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonParser;
@@ -20,6 +22,7 @@ import dashboard.model.ABRepository;
 import domain.experiment.Experiment;
 import domain.experiment.StatisticalTest;
 import domain.experiment.UserProfile;
+import domain.pipeline.Pipeline;
 import domain.setup.Setup;
 
 
@@ -66,28 +69,41 @@ public class AdaptationController {
 
         var root = JsonParser.parseString(data).getAsJsonObject();
 
-        List<String> experimentNames = new ArrayList<>();
+        Set<String> experimentNames = new HashSet<>();
         root.get("experiments").getAsJsonArray()
             .forEach(e -> experimentNames.add(e.getAsString()));
 
-        List<String> rules = new ArrayList<>();
+        Set<String> rules = new HashSet<>();
         root.get("transitionRules").getAsJsonArray()
             .forEach(e -> rules.add(e.getAsString()));
 
-        String initialExperiment = root.get("initialExperiment").getAsString();
+        String initialComponent = root.get("initialComponent").getAsString();
 
         // Hacky way to get around the type system in java
-        var experiments = (List<Experiment<?>>)(List<?>) experimentNames.stream().map(repository::getExperiment).toList();
+        var experiments = (Set<Experiment<?>>)(Set<?>) experimentNames.stream()
+            .map(repository::getExperiment).collect(Collectors.toSet());
 
+            
+        // TODO fill in population splits and pipelines later, empty sets for now
         this.feedbackLoop.initializeFeedbackLoop(
             experiments.stream()
-                .map(Experiment::getSetup)
-                .map(s -> repository.getSetup(s))
-                .toList(),
+                .map(s -> repository.getSetup(s.getName()))
+                .collect(Collectors.toSet()),
             experiments, 
-            rules.stream().map(repository::getTransitionRule).toList(),
-            initialExperiment);
+            rules.stream().map(repository::getTransitionRule).collect(Collectors.toSet()),
+            Set.of(),
+            Set.of(),
+            initialComponent);
 
+        this.logger.info("Feedback loop initialized");
+    }
+
+    @PostMapping("startPipeline") 
+    public void startFeedbackLoopPipeline(@RequestParam(name="pipelineName") String pipelineName) {
+        this.logger.info(String.format("Starting the feedback loop with pipeline '%s'.", pipelineName));
+
+        Pipeline pipeline = repository.getPipeline(pipelineName);
+        this.feedbackLoop.initializeFeedbackLoop(pipeline, this.repository);
         this.logger.info("Feedback loop initialized");
     }
 

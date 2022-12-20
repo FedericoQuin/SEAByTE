@@ -12,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import adaptation.FeedbackLoop;
 import dashboard.model.ABRepository;
 import dashboard.service.ABExperimentService;
+import dashboard.service.ABPipelineService;
+import dashboard.service.ABPopulationSplitService;
 import dashboard.service.ABRunService;
 import dashboard.service.ABSetupService;
 import dashboard.service.AdaptationService;
@@ -59,6 +61,16 @@ public class Dashboard {
 	@Bean
 	public UserProfileService UserProfileService() {
 		return new UserProfileService();
+	}
+
+	@Bean
+	public ABPopulationSplitService abPopulationSplitService() {
+		return new ABPopulationSplitService();
+	}
+
+	@Bean
+	public ABPipelineService abPipelineService() {
+		return new ABPipelineService();
 	}
 
 

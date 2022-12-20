@@ -4,23 +4,30 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import adaptation.Knowledge.WorkflowStep;
 import adaptation.mape.Analyzer;
 import adaptation.mape.Executor;
 import adaptation.mape.Monitor;
 import adaptation.mape.Planner;
+import dashboard.model.ABRepository;
+import domain.ABComponent;
 import domain.Constants;
 import domain.URLRequest;
 import domain.experiment.Experiment;
 import domain.experiment.TransitionRule;
 import domain.experiment.UserProfile;
 import domain.locust.LocustRunner;
+import domain.pipeline.Pipeline;
 import domain.setup.Setup;
+import domain.split.PopulationSplit;
 
 public class FeedbackLoop {
 
@@ -66,25 +73,93 @@ public class FeedbackLoop {
         return this.isActive;
     }
 
-    public void initializeFeedbackLoop(List<Setup> setups, 
-            List<Experiment<?>> experiments,
-            List<TransitionRule> rules, 
-            String initialExperiment) {
+    public void initializeFeedbackLoop(Pipeline pipeline, ABRepository repository) {
         
-        // Handling the setups
+        Set<Experiment<?>> experiments = pipeline.getExperiments().stream()
+            .map(e -> repository.getExperiment(e))
+            .collect(Collectors.toSet());
+
+        this.initializeFeedbackLoop(experiments.stream()
+                .map(Experiment::getSetup)
+                .map(s -> repository.getSetup(s))
+                .collect(Collectors.toSet()), 
+            experiments, 
+            pipeline.getTransitionRules().stream()
+                .map(r -> repository.getTransitionRule(r))
+                .collect(Collectors.toSet()), 
+            pipeline.getPopulationSplits().stream()
+                .map(s -> repository.getPopulationSplit(s))
+                .collect(Collectors.toSet()), 
+            pipeline.getPipelines().stream()
+                .map(p -> repository.getPipeline(p))
+                .collect(Collectors.toSet()), 
+            pipeline.getStartingComponent());
+    }
+
+    public void initializeFeedbackLoop(
+            Set<Setup> setups, 
+            Set<Experiment<?>> experiments, 
+            Set<TransitionRule> rules, 
+            Set<PopulationSplit> populationSplits,
+            Set<Pipeline> pipelines, 
+            String startingComponent) {
+                
+        
         knowledge.addSetups(setups);
-
-        // Handling the experiments
         knowledge.addExperiments(experiments);
-        var currentExperiment = experiments.stream()
-            .filter(e -> e.getName().equals(initialExperiment))
-            .findFirst().orElseThrow();
-        knowledge.setCurrentExperiment(currentExperiment);
-
-        // Handling the evolution rules
         knowledge.addTransitionRules(rules);
+        knowledge.addPopulationSplits(populationSplits);
+        knowledge.addPipelines(pipelines);
         
         
+        var currentComponent = this.knowledge.getComponent(startingComponent);
+        currentComponent.handleComponentInPipeline(this);
+    }
+
+    
+    public void handleComponent(Experiment<?> experiment) {
+
+        // When this method is called, no previous experiment has been started yet
+        // TODO verify this is still true at the end of the implementation
+        this.knowledge.setCurrentExperiment(experiment);
+
+        // Start the experiment
+        this.startExperiment();
+
+        // Do not deploy new setup if the previous component is an experiment with the same setup
+        // if (this.currentComponent instanceof Experiment && 
+        //         ((Experiment<?>) (this.currentComponent)).getSetup().equals(experiment.getSetup())) {
+        //     // Do nothing
+        // } else {
+        //     int networkPort = Networking.generateAvailableNetworkPort();
+        //     var commands = experiment.getStartCommands(this.pipelineComponents.setups.stream()
+        //         .filter(s -> s.getName().equals(experiment.getSetup())).findFirst().orElseThrow(), networkPort);
+        
+        //     PipelineRunner.executeCommands(commands);
+        // }
+    }
+
+
+
+    public void handleComponent(ABComponent component) {
+        throw new RuntimeException(String.format("'handleComponent' method not implemented yet for component of type %s", 
+            component.getClass().getName()));
+    }
+
+
+
+    
+    public void setActiveExperiment(Experiment<?> experiment) {
+        this.knowledge.setCurrentExperiment(experiment);
+    }
+
+
+    public void startExperiment(Experiment<?> experiment) {
+        this.startExperiment(experiment, false);    
+    }
+
+
+    public void startExperiment(Experiment<?> experiment, boolean blockThread) {
         // Start the experiment
         this.startExperiment();
 
@@ -92,29 +167,15 @@ public class FeedbackLoop {
             Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, TimeUnit.SECONDS);
         
         this.isActive = true;
+
+        if (blockThread) {
+            try {
+                this.service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {} // TODO handle this exception?
+        }
     }
 
 
-    public Optional<Setup> getDeployedSetup() {
-        return this.knowledge.getCurrentSetup();
-    }
-
-    public Optional<Experiment<?>> getCurrentExperiment() {
-        return this.knowledge.getCurrentExperiment();
-    }
-
-    public Optional<UserProfile> getCurrentUserProfile() {
-        return this.knowledge.getCurrentExperiment().map(Experiment::getUserProfile);
-    }
-
-
-    public List<URLRequest> getRequestsA() {
-        return this.knowledge.getRequestsA();
-    }
-
-    public List<URLRequest> getRequestsB() {
-        return this.knowledge.getRequestsB();
-    }
 
     private void startSetup(Setup setup) {
         // Handling the setup
@@ -219,6 +280,11 @@ public class FeedbackLoop {
                     e.getClass().getName(), e.getMessage()));
             }
         });
+        
+        this.service.scheduleAtFixedRate(this::triggerAdaptationCycle, Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, 
+            Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, TimeUnit.SECONDS);
+        
+        this.isActive = true;
     }
 
 
@@ -248,6 +314,29 @@ public class FeedbackLoop {
             this.knowledge.reset();
         }
 
+    }
+
+
+
+    public Optional<Setup> getDeployedSetup() {
+        return this.knowledge.getCurrentSetup();
+    }
+
+    public Optional<Experiment<?>> getCurrentExperiment() {
+        return this.knowledge.getCurrentExperiment();
+    }
+
+    public Optional<UserProfile> getCurrentUserProfile() {
+        return this.knowledge.getCurrentExperiment().map(Experiment::getUserProfile);
+    }
+
+
+    public List<URLRequest> getRequestsA() {
+        return this.knowledge.getRequestsA();
+    }
+
+    public List<URLRequest> getRequestsB() {
+        return this.knowledge.getRequestsB();
     }
 
 
@@ -291,4 +380,24 @@ public class FeedbackLoop {
             executor.execute();
         }
     }
+
+
+
+
+
+
+
+    public record PipelineComponents(
+        Set<Setup> setups,
+        Set<Experiment<?>> experiments,
+        Set<TransitionRule> rules,
+        Set<PopulationSplit> populationSplits,
+        Set<Pipeline> pipelines
+    ) {
+        public ABComponent getComponent(String name) {
+            return Stream.concat(experiments.stream(), populationSplits.stream())
+                .filter(c -> c.getName().equals(name))
+                .findFirst().orElseThrow();
+        }
+    } 
 }
