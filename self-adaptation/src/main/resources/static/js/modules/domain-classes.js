@@ -137,3 +137,25 @@ export class TransitionRule {
     }
 }
 
+
+
+export class PopulationSplit {
+    constructor(name, pipelineName1, pipelineName2, splitComponent) {
+        this.name = name;
+        this.pipelineName1 = pipelineName1;
+        this.pipelineName2 = pipelineName2;
+        this.splitComponent = splitComponent;
+    }
+}
+
+
+export class Pipeline {
+    constructor(name, experiments, transitionRules, populationSplits, pipelines, startingComponent) {
+        this.name = name;
+        this.experiments = experiments;
+        this.transitionRules = transitionRules;
+        this.populationSplits = populationSplits;
+        this.pipelines = pipelines;
+        this.startingComponent = startingComponent;
+    }
+}

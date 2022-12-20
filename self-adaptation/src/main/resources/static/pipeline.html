@@ -7,8 +7,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/css/style.css">
-  <script async type="module" src="/js/main.js"></script>
-  <script async src="js/modules/plotly-2.8.3.min.js"></script>
+  <script async type="module" src="/js/pipeline.js"></script>
   <style>
   body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
@@ -21,38 +20,30 @@
   <div class="w3-top" style="border-radius: 5px; padding: 20px;">
     <div class="w3-bar w3-blue w3-card w3-left-align w3-large" style="border-radius: 10px; padding: 10px;">
       <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-blue" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-      <a href="/" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
+      <a href="/" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Home</a>
       <a href="/setup" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Setup</a>
       <a href="/profile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Profile</a>
       <a href="/experiment" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Experiment</a>
       <a href="/rule" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Rule</a>
       <a href="/split" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Split</a>
-      <a href="/pipeline" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Pipeline</a>
+      <a href="/pipeline" class="w3-bar-item w3-button w3-padding-large w3-white">Pipeline</a>
       <a href="/run" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Run</a>
     </div>
+  </div>
+  <div style="padding: 128px 16px">
+    UNDER CONSTRUCTION
   </div>
 </section>
 
 <section class="main-body">
-  <div style="padding: 108px 0px 20px 16px">
-    <!-- <p><b><u>Self-Adaptation of AB tests in the Web-Store</u></b></p> -->
-    
-    <div class="status" id="status-ab" style="max-width: 900px;"></div>
-    <div class="status" id="boxplot-status" style="max-width: 900px; margin: 20px 0px 5px 5px"></div>
-  </div>
 </section>
-
 
 <script>
 window.onload = function() {
-  // Poll for status updates of the feedback loop if applicable
-  pollFeedbackLoop();
-  updateBoxPlots();
-  let refresh = setInterval(pollFeedbackLoop, 5 * 1000);
-  let refreshBoxPlot = setInterval(updateBoxPlots, 5 * 1000);
+  // TODO
 }
-
 </script>
 </body>
+
 
 </html>

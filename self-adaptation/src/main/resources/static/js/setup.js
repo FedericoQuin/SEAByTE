@@ -12,8 +12,10 @@ function updateStatus(message, color='#000000') {
 
 
 
-function sendSetupToServer(setup, form=null) {
-    fetch("/setup/newSetup", {
+export async function sendSetupToServer(setup, form=null) {
+    setTimeout(() => {updateStatus('');}, 10000);
+
+    return fetch("/setup/newSetup", {
         method: 'post', 
         headers: {'Content-Type': 'application/json'}, 
         body: JSON.stringify(setup)
@@ -28,10 +30,6 @@ function sendSetupToServer(setup, form=null) {
         }
     })
     .catch(error => updateStatus('Could not add AB setup.', COLORS.STATUS_LABEL_COLOR_FAIL));
-
-    setTimeout(() => {updateStatus('');}, 10000);
-
-    return false;
 }
 
 
@@ -51,16 +49,16 @@ function populateDockerImages() {
 }
 
 
-window.sendCustomSetup = () => {
+window.sendCustomSetup = async () => {
     let form = document.getElementById('form-setup');
     const formData = new FormData(document.forms['form-setup']);
-    sendSetupToServer(Setup.constructFromForm(formData), form);
+    await sendSetupToServer(Setup.constructFromForm(formData), form);
 }
 
 
     
-window.addDefaultSetup = () => {
-    sendSetupToServer(new Setup(
+window.addDefaultSetup = async () => {
+    await sendSetupToServer(new Setup(
         'Recommendation_upgrade',
         new DockerService('ws-recommendation-service-1-0-0', 'ws-recommendation-service-image:1.0.0'),
         new DockerService('ws-recommendation-service-1-1-0', 'ws-recommendation-service-image:1.1.0'),

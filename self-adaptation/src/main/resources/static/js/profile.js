@@ -19,8 +19,10 @@ window.init = () => {
 
 
 
-function sendUserProfileToServer(userProfile, form=null) {
-    fetch("/profile/newProfile", {
+export async function sendUserProfileToServer(userProfile, form=null) {
+    setTimeout(() => {updateStatus('');}, 10000);
+
+    return fetch("/profile/newProfile", {
         method: 'post', 
         headers: {'Content-Type': 'application/json'}, 
         body: JSON.stringify(userProfile)
@@ -37,10 +39,6 @@ function sendUserProfileToServer(userProfile, form=null) {
         }
     })
     .catch(error => updateStatus('Could not add user profile.', COLORS.STATUS_LABEL_COLOR_FAIL));
-
-    setTimeout(() => {updateStatus('');}, 10000);
-
-    return false;
 }
 
 
@@ -105,7 +103,7 @@ window.addRequiredEnvironmentVariables = (element) => {
 }
 
 
-window.addUserProfile = () => {
+window.addUserProfile = async () => {
     let form = document.getElementById('form-user-profile');
     const formData = new FormData(document.forms['form-user-profile']);
 
@@ -124,16 +122,16 @@ window.addUserProfile = () => {
         users.push(new LocustUser(locustName, numberOfUsers, vars));
     }
 
-    sendUserProfileToServer(new UserProfile(formData.get('nameProfile'), users), form);
+    await sendUserProfileToServer(new UserProfile(formData.get('nameProfile'), users), form);
     return false;
 }
 
 
 
 
-window.addDefaultUserProfiles = () => {
+window.addDefaultUserProfiles = async () => {
 
-    sendUserProfileToServer(
+    await sendUserProfileToServer(
         new UserProfile('Standard', [
             new LocustUser('RegularUser', 80, [
                 new EnvironmentVariable('clickChanceA', 0.1),

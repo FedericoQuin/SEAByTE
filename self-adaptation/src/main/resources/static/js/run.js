@@ -1,5 +1,4 @@
 
-// const constants = require('./modules/constants.js')
 import {COLORS} from './modules/constants.js'
 import {updateStatus as baseUpdateStatus} from './modules/status.js'
 
@@ -39,40 +38,6 @@ function updateStatus(message, color='#000000', loader=null) {
 
 
 
-window.runDefaultSetup = () => {
-    (async () => {
-        updateStatusWithDefaultLoader('Running the default AB setup...', COLORS.STATUS_LABEL_COLOR_PENDING);
-        let f = await fetch('run/runDefaultSetup', {method: 'post'});
-        let response = f.status;
-
-        if (response == 200) {
-            updateStatus('AB setup succesfully finished.', COLORS.STATUS_LABEL_COLOR_SUCCES);
-        } else {
-            updateStatus('AB setup failed to run.', COLORS.STATUS_LABEL_COLOR_FAIL);
-        }
-    })();
-}
-
-
-
-window.runSetup = (setupName) => {
-    (async () => {
-        updateStatusWithDefaultLoader(`Running AB setup named ${setupName}...`, COLORS.STATUS_LABEL_COLOR_PENDING);
-        let f = await fetch('run/runSetup?' + new URLSearchParams({name: setupName}), 
-            {method: 'post'});
-        let response = f.status;
-
-        if (response == 200) {
-            updateStatus('AB setup succesfully finished.', COLORS.STATUS_LABEL_COLOR_SUCCES);
-        } else {
-            updateStatus('AB setup failed to run.', COLORS.STATUS_LABEL_COLOR_FAIL);
-        }
-    })();
-}
-
-
-
-
 window.populateSetups = () => {
     (async () => {
         let setups = document.getElementById('list-setups');
@@ -85,20 +50,11 @@ window.populateSetups = () => {
             // TODO order alphabetically
             for (let setup of data) {
                 addSetupCollapsible(setups, setup);
-                addSetupForm(setup);
             }
         }
         
     })();
 }
-
-// function addSetupCollapsible(rootElement, setup) {
-//     rootElement.innerHTML += `\n<div class="grid-item-margin">
-//         <details>
-//             <summary>${setup['name']}</summary>
-//             <p>Information about the setup in question</p>
-//         </details></div>`;
-// }
 
 
 function addSetupCollapsible(rootElement, setup) {
@@ -118,12 +74,9 @@ function addSetupCollapsible(rootElement, setup) {
         </details></div>`;
 }
 
-function addSetupForm(setup) {
-    var formElem = document.getElementById('setupName');
 
-    formElem.insertAdjacentHTML('beforeend', 
-        `<option value="${setup['name']}">${setup['name']}</option>`);
-}
+
+
 
 window.populateExperiments = () => {
     (async () => {
@@ -138,8 +91,6 @@ window.populateExperiments = () => {
             for (let experiment of data) {
                 const experimentName = experiment['name'];
                 addExperimentCollapsible(experiments, experiment);
-                addExperimentForm(experimentName);
-                addInitialExperimentForm(experimentName);
             }
         }
         
@@ -170,24 +121,6 @@ function addExperimentCollapsible(rootElement, experiment) {
 }
 
 
-function addExperimentForm(experimentName) {
-    let expElem = document.getElementById('selectExperiments');
-    // <input type="checkbox" id="${experimentName}" name="experiments" value="${experimentName}"></input>
-
-    expElem.insertAdjacentHTML('beforeend', `<div>
-        <label for="${experimentName}" class="container">${experimentName}
-            <input type="checkbox" id="${experimentName}" name="experiments" value="${experimentName}"></input>
-            <span class="checkmark"></span>
-        </label>
-    </div>`);
-}
-
-function addInitialExperimentForm(experimentName) {
-    let initExpElem = document.getElementById('initialExperiment');
-    
-    initExpElem.insertAdjacentHTML('beforeend', 
-        `<option value="${experimentName}">${experimentName}</option>`);
-}
 
 
 
@@ -202,9 +135,7 @@ window.populateRules = () => {
 
             // TODO order alphabetically
             for (let rule of data) {
-                const ruleName = rule['name'];
                 addRuleCollapsible(rulesList, rule);
-                addRuleForm(ruleName);
             }
         }
         
@@ -232,41 +163,103 @@ function addRuleCollapsible(rootElement, rule) {
 }
 
 
-function addRuleForm(ruleName) {
-    let expElem = document.getElementById('selectRules');
 
-    expElem.insertAdjacentHTML('beforeend', `<div>
-        <label for="${ruleName}" class="container">${ruleName}
-            <input type="checkbox" id="${ruleName}" name="rules" value="${ruleName}"></input>
-            <span class="checkmark"></span>
-        </label>
-    </div>`);
+
+window.populateSplits = () => {
+    (async () => {
+        let splitList = document.getElementById('list-splits');
+
+        let response = await fetch('/split/retrieve');
+
+        if (response.status == 200) {
+            let data = await response.json();
+
+            // TODO order alphabetically
+            for (let split of data) {
+                addSplitCollapsible(splitList, split);
+            }
+        }
+
+    })();
+    }
+
+function addSplitCollapsible(rootElement, split) {
+    rootElement.innerHTML += `\n<div class="grid-item-margin">
+        <details>
+            <summary>
+                <div class="steps bg-light-blue">
+                    <svg width="22" height="22"><image xlink:href="/svg/info.svg"/></svg>
+                    <div class="name bg-light-blue">${split['name']}<div>
+                </div>
+            </summary>
+            <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">
+            ${['Name:', `${split['name']}`, 
+               'Pipeline 1:', `${split['pipelineName1']}`, 
+               'Pipeline 2:', `${split['pipelineName2']}`,
+               'Component:', `${split['splitComponent']['imageName']}`]
+                   .map(x => `<div>${x}</div>`).join('\n')}</div>
+        </details></div>`;
+}
+
+
+
+window.populatePipelines = () => {
+    (async () => {
+
+        let pipelines = document.getElementById('list-pipelines');
+        let response = await fetch('/pipeline/retrieve');
+
+        if (response.status == 200) {
+            let data = await response.json();
+
+            // TODO order alphabetically?
+            for (let pipeline of data) {
+                const pipelineName = pipeline['name'];
+                addPipelineCollapsible(pipelines, pipeline);
+                addInitialPipelineForm(pipelineName);
+            }
+        }
+        
+    })();
+}
+
+function addPipelineCollapsible(rootElement, pipeline) {
+    rootElement.innerHTML += `\n<div class="grid-item-margin">
+        <details>
+        <summary>
+            <div class="steps bg-light-blue">
+            <svg width="22" height="22"><image xlink:href="/svg/info.svg"/></svg>
+            <div class="name bg-light-blue">${pipeline['name']}<div>
+            </div>
+        </summary>
+        <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">
+        ${['Name:', `${pipeline['name']}`, 
+            'Experiments:', `${pipeline['experiments'].map(x => `'${x}'`).join(', ')}`, 
+            'Transition rules:', `${pipeline['transitionRules'].map(x => `'${x}'`).join(', ')}`,
+            'Population splits:', `${pipeline['populationSplits'].map(x => `'${x}'`).join(', ')}`,
+            'Pipelines:', `${pipeline['pipelines'].map(x => `'${x}'`).join(', ')}`,
+            'Starting component:', `${pipeline['startingComponent']}`]
+                .map(x => `<div>${x}</div>`).join('\n')}</div>
+        </details></div>`;
+}
+
+
+function addInitialPipelineForm(pipelineName) {
+    let pipelineToRun = document.getElementById('pipelineToRun');
+    
+    pipelineToRun.insertAdjacentHTML('beforeend', 
+        `<option value="${pipelineName}">${pipelineName}</option>`);
 }
 
 
 
 
-window.startFeedbackLoop = () => {
-    const selectedExperiments = Array.from(document.getElementsByName('experiments'))
-        .filter(c => c.checked)
-        .map(c => c.value);
-    const rules = Array.from(document.getElementsByName('rules'))
-        .filter(c => c.checked)
-        .map(c => c.value);
-    const initialExperimentName = document.getElementById('initialExperiment').value;
 
-    if (!initialExperimentName) {
-        updateStatus('Make sure am initial experiment is specified.');
-        return;
-    }
+function startPipeline(pipelineName) {
     (async () => {
-        updateStatusWithDefaultLoader(`Starting feedback loop with experiment '${initialExperimentName}'...`, COLORS.STATUS_LABEL_COLOR_PENDING);
-        const f = await fetch('adaptation/start', 
-            {method: 'post', body: JSON.stringify({
-                experiments: selectedExperiments,
-                transitionRules: rules,
-                initialExperiment: initialExperimentName
-            })});
+        updateStatusWithDefaultLoader(`Starting feedback loop with pipeline '${pipelineName}'...`, COLORS.STATUS_LABEL_COLOR_PENDING);
+        const f = await fetch(`adaptation/startPipeline?` + new URLSearchParams({pipelineName: pipelineName}), 
+            {method: 'post'});
         const response = f.status;
 
         if (response == 200) {
@@ -276,6 +269,18 @@ window.startFeedbackLoop = () => {
         }
     })();
 }
+
+window.startFeedbackLoop = () => {
+    const pipeline = document.getElementById('pipelineToRun').value;
+
+    if (!pipeline) {
+        updateStatus('Make sure a pipeline is specified.');
+        return;
+    }
+
+    startPipeline(pipeline);
+}
+
 
 
 window.stopFeedbackLoop = () => {
@@ -294,5 +299,188 @@ window.stopFeedbackLoop = () => {
 }
 
 
-// export {populateSetups, populateExperiments};
+import {sendSetupToServer} from './setup.js'
+import {sendUserProfileToServer} from './profile.js'
+import {sendExperimentToServer} from './experiment.js'
+import {sendTransitionRuleToServer} from './rule.js'
+import {Setup, Experiment, UserProfile, TransitionRule, DockerService, LocustUser, EnvironmentVariable, ABAssignment, StatisticalTest, Condition, Pipeline, PopulationSplit} from './modules/domain-classes.js'
+import { sendPipelineToServer } from './pipeline.js';
+import { sendPopulationSplitToServer } from './split.js';
+
+window.experimentation = async () => {
+
+    // Default pipeline and its subcomponents
+
+    await sendSetupToServer(new Setup(
+        'Recommendation_upgrade',
+        new DockerService('ws-recommendation-service-1-0-0', 'ws-recommendation-service-image:1.0.0'),
+        new DockerService('ws-recommendation-service-1-1-0', 'ws-recommendation-service-image:1.1.0'),
+        new DockerService('ws-recommendation-service', 'ab-component-image:latest'),
+        'ws-recommendation-service'
+    ));
+
+    await sendUserProfileToServer(
+        new UserProfile('Standard', [
+            new LocustUser('RegularUser', 80, [
+                new EnvironmentVariable('clickChanceA', 0.1),
+                new EnvironmentVariable('clickChanceB', 0.2),
+                new EnvironmentVariable('purchaseChanceA', 0.05),
+                new EnvironmentVariable('purchaseChanceB', 0.15),
+            ])
+        ]
+    ));
+
+    await sendExperimentToServer(new Experiment(
+        'Upgrade v1.0.0 - v1.1.0',
+        'Recommendation_upgrade',
+        'Standard',
+        100,
+        new ABAssignment(50, 50),
+        ['ResponseTime_A', 'ResponseTime_B'],
+        new StatisticalTest(
+            new Condition('ResponseTime_A', '==', 'ResponseTime_B'),
+            0.025,
+            'welsh-t-test',
+            'result-welsh-t-test'
+        )
+    ));
+
+
+    await sendExperimentToServer(new Experiment(
+        'Clicks v1.0.0 - v1.1.0',
+        'Recommendation_upgrade',
+        'Standard',
+        100,
+        new ABAssignment(30, 70),
+        ['Clicks_A', 'Clicks_B'],
+        new StatisticalTest(
+            new Condition('Clicks_A', '==', 'Clicks_B'),
+            0.025,
+            'one-proportional-test',
+            'result-clicks'
+        )
+    ));
+
+
+    await sendExperimentToServer(new Experiment(
+        'Purchases v1.0.0 - v1.1.0',
+        'Recommendation_upgrade',
+        'Standard',
+        100,
+        new ABAssignment(20, 80),
+        ['Purchases_A', 'Purchases_B'],
+        new StatisticalTest(
+            new Condition('Purchases_A', '==', 'Purchases_B'),
+            0.025,
+            'one-proportional-test',
+            'result-purchases'
+        )
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Upgrade-succes-inconclusive',
+        'Upgrade v1.0.0 - v1.1.0',
+        'Clicks v1.0.0 - v1.1.0',
+        [new Condition('result-welsh-t-test', '!=', 'reject')]
+    ));
+
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Upgrade-succes-reject',
+        'Upgrade v1.0.0 - v1.1.0',
+        'Clicks v1.0.0 - v1.1.0',
+        [new Condition('result-welsh-t-test', '==', 'reject'), 
+            new Condition('mean(ResponseTime_A)', '>=', 'mean(ResponseTime_B)')]
+    ));
+
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Upgrade-fail',
+        'Upgrade v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-welsh-t-test', '==', 'reject'), 
+            new Condition('mean(ResponseTime_A)', '<', 'mean(ResponseTime_B)')]
+    ));
+
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Clicks-succes-reject',
+        'Clicks v1.0.0 - v1.1.0',
+        'Purchases v1.0.0 - v1.1.0',
+        [new Condition('result-clicks', '==', 'reject'),
+            new Condition('mean(Clicks_A)', '<=', 'mean(Clicks_B)')]
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Clicks-succes-inconclusive',
+        'Clicks v1.0.0 - v1.1.0',
+        'Purchases v1.0.0 - v1.1.0',
+        [new Condition('result-clicks', '==', 'inconclusive'),
+            new Condition('mean(Clicks_A)', '<=', 'mean(Clicks_B)')]
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Clicks-fail-inconclusive',
+        'Clicks v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-clicks', '==', 'inconclusive'),
+            new Condition('mean(Clicks_A)', '>', 'mean(Clicks_B)')]
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Clicks-fail-reject',
+        'Clicks v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-clicks', '==', 'reject'),
+            new Condition('mean(Clicks_A)', '>', 'mean(Clicks_B)')]
+    ));
+
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Purchases-succes-reject',
+        'Purchases v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-purchases', '==', 'reject'),
+            new Condition('mean(Purchases_A)', '<=', 'mean(Purchases_B)')]
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Purchases-succes-inconclusive',
+        'Purchases v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-purchases', '==', 'inconclusive'),
+            new Condition('mean(Purchases_A)', '<=', 'mean(Purchases_B)')]
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Purchases-fail-reject',
+        'Purchases v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-purchases', '==', 'reject'),
+            new Condition('mean(Purchases_A)', '>', 'mean(Purchases_B)')]
+    ));
+
+    await sendTransitionRuleToServer(new TransitionRule(
+        'Purchases-fail-inconclusive',
+        'Purchases v1.0.0 - v1.1.0',
+        'end',
+        [new Condition('result-purchases', '==', 'inconclusive'),
+            new Condition('mean(Purchases_A)', '>', 'mean(Purchases_B)')]
+    ));
+
+    await sendPipelineToServer(new Pipeline(
+        'Default_scenario',
+        ['Upgrade v1.0.0 - v1.1.0', 'Clicks v1.0.0 - v1.1.0', 'Purchases v1.0.0 - v1.1.0'],
+        ['Purchases-fail-reject', 'Clicks-succes-inconclusive', 'Purchases-succes-reject', 'Clicks-fail-inconclusive', 'Upgrade-succes-reject', 'Clicks-fail-reject', 'Purchases-fail-inconclusive', 'Upgrade-fail', 'Upgrade-succes-inconclusive', 'Clicks-succes-reject', 'Purchases-succes-inconclusive'],
+        [],
+        [],
+        'Upgrade v1.0.0 - v1.1.0'
+    ));
+
+
+
+
+}
+
+
 

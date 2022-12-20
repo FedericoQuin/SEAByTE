@@ -1,15 +1,31 @@
 
 import {Experiment, ABAssignment, Condition, StatisticalTest} from './modules/domain-classes.js'
+import {updateStatus} from './modules/status.js'
+import { COLORS } from './modules/constants.js';
 
 
 
 
-function addExperimentToServer(experiment) {
-    fetch("/experiment/newExperiment", {
+export async function sendExperimentToServer(experiment, form=null) {
+    setTimeout(() => {updateStatus('');}, 10000);
+
+    return fetch("/experiment/newExperiment", {
         method: 'post', 
         headers: {'Content-type': 'application/json'}, 
         body: JSON.stringify(experiment)
-    });
+    })
+    .then(response => {
+        if (response.status == 200) {
+            updateStatus('Experiment succesfully added.', COLORS.STATUS_LABEL_COLOR_SUCCES);
+            
+            if (form) {
+                form.reset();
+            }
+        } else {
+            updateStatus('Could not add experiment.', COLORS.STATUS_LABEL_COLOR_FAIL);
+        }
+    })
+    .catch(error => updateStatus('Could not add experiment.', COLORS.STATUS_LABEL_COLOR_FAIL));
 }
 
 
@@ -30,9 +46,7 @@ window.publishExperiment = () => {
         return;
     }
 
-    addExperimentToServer(Experiment.constructFromForm(formData));
-
-    form.reset();
+    sendExperimentToServer(Experiment.constructFromForm(formData), form);
     return false;
 }
 
@@ -63,7 +77,7 @@ window.getSetups = () => {
 
 
 window.publishDefaultExperiments = () => {
-    addExperimentToServer(new Experiment(
+    sendExperimentToServer(new Experiment(
         'Upgrade v1.0.0 - v1.1.0',
         'Recommendation_upgrade',
         'Standard',
@@ -79,7 +93,7 @@ window.publishDefaultExperiments = () => {
     ));
 
 
-    addExperimentToServer(new Experiment(
+    sendExperimentToServer(new Experiment(
         'Clicks v1.0.0 - v1.1.0',
         'Recommendation_upgrade',
         'Standard',
@@ -95,7 +109,7 @@ window.publishDefaultExperiments = () => {
     ));
 
 
-    addExperimentToServer(new Experiment(
+    sendExperimentToServer(new Experiment(
         'Purchases v1.0.0 - v1.1.0',
         'Recommendation_upgrade',
         'Standard',

@@ -6,8 +6,10 @@ import {COLORS} from './modules/constants.js'
 
 
 
-function sendTransitionRuleToServer(transitionRule, form=null) {
-    fetch("/rule/newRule", {
+export async function sendTransitionRuleToServer(transitionRule, form=null) {
+    setTimeout(() => {updateStatus('');}, 10000);
+
+    return fetch("/rule/newRule", {
         method: 'post', 
         headers: {'Content-Type': 'application/json'}, 
         body: JSON.stringify(transitionRule)
@@ -23,10 +25,6 @@ function sendTransitionRuleToServer(transitionRule, form=null) {
         }
     })
     .catch(error => updateStatus('Could not add transition rule.', COLORS.STATUS_LABEL_COLOR_FAIL));
-
-    setTimeout(() => {updateStatus('');}, 10000);
-
-    return false;
 }
 
 

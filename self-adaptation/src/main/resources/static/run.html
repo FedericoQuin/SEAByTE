@@ -27,6 +27,8 @@
       <a href="/profile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Profile</a>
       <a href="/experiment" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Experiment</a>
       <a href="/rule" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Rule</a>
+      <a href="/split" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Split</a>
+      <a href="/pipeline" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Pipeline</a>
       <a href="/run" class="w3-bar-item w3-button w3-padding-large w3-white">Run</a>
     </div>    
     <div style="padding: 5px 0px; margin-top: 20px;">
@@ -42,7 +44,7 @@
   <main>
 
 
-    <div style="border: 1px; border-style: solid; width: 80%; margin: 30px 0px 0px 10px; max-width: 800px;">
+    <div style="border: 1px; border-style: solid; width: 100%; margin: 30px 0px 0px 10px; max-width: 1200px; display: grid; column-gap: 10px; grid-template-columns: 1fr 1fr;">
       <div style="margin: 5px 0px 5px 5px">
         <label class="large">Available setups:</label><br>
         <!-- <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div><br> -->
@@ -58,30 +60,28 @@
 
       <div style="margin: 5px 0px 5px 5px">
         <label class="large">Available transition rules:</label>
-        <div id="list-rules" style="padding: 10px">
+        <div id="list-rules" style="padding: 10px;">
+        </div>
+      </div>
+      <div style="margin: 5px 0px 5px 5px">
+        <label class="large">Available population splits:</label>
+        <div id="list-splits" style="padding: 10px;">
+        </div>
+      </div>
+      <div style="margin: 5px 0px 5px 5px">
+        <label class="large">Available pipelines:</label>
+        <div id="list-pipelines" style="padding: 10px;">
         </div>
       </div>
     </div>
 
     <div class="grid-container" style="gap: 10px; margin: 40px 5px 5px 5px; width: 50%;">
-      <!-- <button type="button" onclick="runDefaultSetup();">Run default setup</button><br> -->
 
+      
       <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
-        <label class="run-label" style="padding-bottom: 23px;">Experiments:</label>
-        <div class="grid-container" id="selectExperiments" name="selectExperiments" style=" align-items: center;">
-        </div>
-      </div>
-
-      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
-        <label class="run-label" style="padding-bottom: 23px;">Transition rules:</label>
-        <div class="grid-container" id="selectRules" name="selectRules">
-        </div>
-      </div>
-
-      <div class="grid-container" style="grid-template-columns: 1fr 2fr;">
-        <label class="steps run-label">Initial experiment:</label>
-        <select id="initialExperiment" name="initialExperiment">
-          <option selected disabled hidden value="">Select initial experiment...</option>
+        <label class="steps run-pipeline-label">Pipeline to run:</label>
+        <select id="pipelineToRun" name="pipelineToRun">
+          <option selected disabled hidden value="">Select pipeline...</option>
         </select>
       </div>
       
@@ -91,19 +91,24 @@
     <div style="margin: 5px; width: 50%;">
       <button type="button" class="red-button" onclick="stopFeedbackLoop();">Stop feedback loop</button>
     </div>
+
+    <div style="margin: 5px; width: 50%;">
+      <button type="button" class="experiment-button" onclick="experimentation();">Experiment</button>
+    </div>
   </main>
 </section>
 
 
 
 <script>
-// import {populateSetups, populateExperiments} from './js/run.js';
 
 window.onload = function() {
   // TODO render these into html server side instead
   populateSetups();
   populateExperiments();
   populateRules();
+  populateSplits();
+  populatePipelines();
 }
 </script>
 
