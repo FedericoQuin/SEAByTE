@@ -6,6 +6,7 @@ import java.util.Map;
 import adaptation.FeedbackLoop;
 import adaptation.Knowledge;
 import adaptation.Knowledge.WorkflowStep;
+import adaptation.Knowledge.WorkflowStepType;
 import domain.experiment.Experiment;
 import domain.experiment.StatisticalTest;
 import domain.experiment.StatisticalTest.StatisticalResult;
@@ -40,9 +41,8 @@ public class Planner {
             // .map(TransitionRule::getToExperiment)
             .findFirst().orElseThrow();
         
-        this.knowledge.addToHistory(new WorkflowStep("Rule", rule.getName()));
+        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Rule, rule.getName()));
         
         this.knowledge.setNextExperimentName(rule.getToExperiment());
-    }
-    
+    }    
 }

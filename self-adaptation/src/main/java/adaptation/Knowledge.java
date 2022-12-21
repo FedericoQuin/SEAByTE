@@ -257,5 +257,21 @@ public class Knowledge {
     }
 
 
-    public record WorkflowStep(String type, String name) {}
+    public enum WorkflowStepType {
+        Setup("Setup"), 
+        Experiment("Experiment"), 
+        Rule("Transition rule"), 
+        Split("Population split");
+
+        private String value;
+
+        private WorkflowStepType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return this.value;
+        }
+    }
+    public record WorkflowStep(WorkflowStepType type, String name) {}
 }

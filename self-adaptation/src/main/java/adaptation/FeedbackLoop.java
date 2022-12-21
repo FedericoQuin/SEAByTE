@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import adaptation.Knowledge.WorkflowStep;
+import adaptation.Knowledge.WorkflowStepType;
 import adaptation.mape.Analyzer;
 import adaptation.mape.Executor;
 import adaptation.mape.Monitor;
@@ -184,7 +185,7 @@ public class FeedbackLoop {
 
         int port = this.effector.deploySetup(setup.getName());
         knowledge.setExposedPort(port, setup.getABComponent().serviceName());
-        knowledge.addToHistory(new WorkflowStep("Setup", setup.getName()));
+        knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Setup, setup.getName()));
     }
 
     private void stopSetup() {
@@ -224,7 +225,7 @@ public class FeedbackLoop {
 
 
 
-        this.knowledge.addToHistory(new WorkflowStep("Experiment", currentExperiment.getName()));
+        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Experiment, currentExperiment.getName()));
         this.knowledge.clearSamples();
 
         // Make sure that the locust process is not running anymore
