@@ -116,18 +116,18 @@ export class UserProfile {
 
 
 export class TransitionRule {
-    constructor(name, fromExperiment, toExperiment, conditions) {
+    constructor(name, fromExperiment, toComponent, conditions) {
         this.name = name;
         this.fromExperiment = fromExperiment;
-        this.toExperiment = toExperiment;
+        this.toComponent = toComponent;
         this.conditions = conditions;
     }
 
     static constructFromForm(formData) {
         return new TransitionRule(
             formData.get('nameRule'),
-            formData.get('fromExperiment'),
-            formData.get('toExperiment'),
+            formData.get('from-experiment'),
+            formData.get('to-component'),
             [new Condition(
                 formData.get('conditionLeftOperand'),
                 formData.get('conditionOperator'),

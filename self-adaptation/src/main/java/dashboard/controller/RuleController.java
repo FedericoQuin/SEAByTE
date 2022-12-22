@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.google.gson.JsonParser;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.google.gson.JsonParser;
 
 import dashboard.model.ABRepository;
 import domain.experiment.StatisticalTest.StatisticalResult;
@@ -50,7 +50,7 @@ public class RuleController {
 
         TransitionRuleBuilder builder = new TransitionRuleBuilder(root.get("name").getAsString(), 
             root.get("fromExperiment").getAsString(), 
-            root.get("toExperiment").getAsString());
+            root.get("toComponent").getAsString());
         
 
         // Reserved keywords for transition rules: [reject, inconclusive]

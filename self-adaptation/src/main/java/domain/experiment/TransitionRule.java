@@ -12,14 +12,14 @@ public class TransitionRule {
     private String name;
     
     private String fromExperiment;
-    private String toExperiment;
+    private String toComponent;
     private List<ConditionTransitionRule> conditions;
 
 
-    private TransitionRule(String name, String fromExperiment, String toExperiment, List<ConditionTransitionRule> conditions) {
+    private TransitionRule(String name, String fromExperiment, String toComponent, List<ConditionTransitionRule> conditions) {
         this.name = name;
         this.fromExperiment = fromExperiment;
-        this.toExperiment = toExperiment;
+        this.toComponent = toComponent;
         this.conditions = conditions;
     }
 
@@ -32,8 +32,8 @@ public class TransitionRule {
         return this.fromExperiment;
     }
 
-    public String getToExperiment() {
-        return this.toExperiment;
+    public String getToComponent() {
+        return this.toComponent;
     }
 
 

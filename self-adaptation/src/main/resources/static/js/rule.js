@@ -31,7 +31,7 @@ export async function sendTransitionRuleToServer(transitionRule, form=null) {
 window.addTransitionRule = () => {
     const name = document.getElementById('nameRule').value;
     const from = document.getElementById('from-experiment').value;
-    const to = document.getElementById('to-experiment').value;
+    const to = document.getElementById('to-component').value;
 
 
     if (!name) {
@@ -45,7 +45,7 @@ window.addTransitionRule = () => {
     }
 
     if (!to) {
-        alert('Make sure to provide a valid to experiment.');
+        alert('Make sure to provide a valid to component.');
         return;
     }
 
@@ -82,17 +82,6 @@ window.addTransitionRule = () => {
 }
 
 
-window.getExperiments = () => {
-    fetch('/experiment/retrieve')
-        .then(response => response.json())
-        .then(data => {
-            let elemFrom = document.getElementById('from-experiment');
-            data.forEach(p => elemFrom.insertAdjacentHTML('beforeend', `<option value="${p.name}">${p.name}</option>`));
-            let elemTo = document.getElementById('to-experiment');
-            data.forEach(p => elemTo.insertAdjacentHTML('beforeend', `<option value="${p.name}">${p.name}</option>`));
-        })
-        .catch((error) => console.log(error));
-}
 
 
 // For now store this globally in memory here?
@@ -136,18 +125,23 @@ function resetConditions() {
 window.loadExperiments = () => {
     fetch('/experiment/retrieve')
         .then(response => response.json())
-        
         .then(data => {
             const experimentNames = data.map(x => x['name']);
             let fromElement = document.getElementById('from-experiment');
-            let toElement = document.getElementById('to-experiment');
+            let toElement = document.getElementById('to-component');
             for (let name of experimentNames) {
                 fromElement.insertAdjacentHTML('beforeend', `<option>${name}</option>`)
                 toElement.insertAdjacentHTML('beforeend', `<option>${name}</option>`)
             }
 
+            fetch('/split/retrieve')
+                .then(response => response.json())
+                .then(dataSplit => {
+                    for (let name of dataSplit.map(x => x['name'])) {
+                        toElement.insertAdjacentHTML('beforeend', `<option>${name}</option>`)
+                    }
             toElement.insertAdjacentHTML('beforeend', '<option>end</option>');
-            // add to the selections
+                });
         })
         .catch(err => console.log(err));
 }

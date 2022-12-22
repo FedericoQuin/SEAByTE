@@ -156,7 +156,7 @@ function addRuleCollapsible(rootElement, rule) {
             <div class="grid-container" style="grid-template-columns: 1fr 5fr; padding-bottom: 10px;">
             ${['Name:', `${rule['name']}`, 
                'From experiment:', `${rule['fromExperiment']}`, 
-               'To experiment:', `${rule['toExperiment']}`,
+               'To component:', `${rule['toComponent']}`,
                'Conditions:', `${rule['conditions'].join('<br>')}`]
                    .map(x => `<div>${x}</div>`).join('\n')}</div>
         </details></div>`;

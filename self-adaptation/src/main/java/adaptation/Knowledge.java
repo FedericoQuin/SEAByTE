@@ -61,8 +61,8 @@ public class Knowledge {
     // Temporary result of the statistical test conducted in the current experiment
     private StatisticalResult statisticalResult;
 
-    // Temporary experiment stored by planner to be used by executor afterwards
-    private String nextExperimentName;
+    // Temporary component stored by planner to be used by executor afterwards
+    private String nextComponentName;
 
 
     // Keep track of all the steps that were taken in the self-AB-test
@@ -147,6 +147,10 @@ public class Knowledge {
         return this.experiments;
     }
 
+    public Experiment<?> getExperiment(String name) {
+        return this.experiments.stream().filter(e -> e.getName().equals(name)).findFirst().orElse(null);
+    }
+
 
     public void addTransitionRules(Collection<TransitionRule> rules) {
         this.transitionRules.addAll(rules);
@@ -157,18 +161,22 @@ public class Knowledge {
         return this.transitionRules;
     }
 
-
-    public void setNextExperimentName(String name) {
-        this.nextExperimentName = name;
+    public TransitionRule getTransitionRule(String name) {
+        return this.transitionRules.stream().filter(r -> r.getName().equals(name)).findFirst().orElse(null);
     }
 
-    public Optional<Experiment<?>> getNextExperiment() {
-        if (this.nextExperimentName == null) {
+
+    public void setNextComponentName(String name) {
+        this.nextComponentName = name;
+    }
+
+    public Optional<ABComponent> getNextComponent() {
+        if (this.nextComponentName == null) {
             return Optional.empty();
         }
 
-        return this.experiments.stream()
-            .filter(e -> e.getName().equals(this.nextExperimentName))
+        return Stream.concat(this.experiments.stream(), this.populationSplits.stream())
+            .filter(e -> e.getName().equals(this.nextComponentName))
             .findFirst();
     }
 
@@ -237,7 +245,7 @@ public class Knowledge {
 
         this.currentSetup = null;
         this.currentExperiment = null;
-        this.nextExperimentName = null;
+        this.nextComponentName = null;
         this.statisticalResult = null;
         this.setups = new HashSet<>();
         this.experiments = new HashSet<>();

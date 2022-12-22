@@ -16,10 +16,8 @@ public class Executor {
     public void execute() {
         var knowledge = this.feedbackLoop.getKnowledge();
 
-        knowledge.getNextExperiment().ifPresentOrElse(n -> {
-            knowledge.setCurrentExperiment(n);
-    
-            feedbackLoop.startExperiment();
+        knowledge.getNextComponent().ifPresentOrElse(c -> {
+            c.handleComponentInPipeline(this.feedbackLoop);
         }, () -> {
             knowledge.setCurrentExperiment(null);
             this.feedbackLoop.stopFeedbackLoop();

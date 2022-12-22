@@ -80,7 +80,8 @@ public class FeedbackLoop {
             .map(e -> repository.getExperiment(e))
             .collect(Collectors.toSet());
 
-        this.initializeFeedbackLoop(experiments.stream()
+        this.initializeFeedbackLoop(
+            experiments.stream()
                 .map(Experiment::getSetup)
                 .map(s -> repository.getSetup(s))
                 .collect(Collectors.toSet()), 
@@ -94,7 +95,8 @@ public class FeedbackLoop {
             pipeline.getPipelines().stream()
                 .map(p -> repository.getPipeline(p))
                 .collect(Collectors.toSet()), 
-            pipeline.getStartingComponent());
+            pipeline.getStartingComponent()
+        );
     }
 
     public void initializeFeedbackLoop(
@@ -105,69 +107,18 @@ public class FeedbackLoop {
             Set<Pipeline> pipelines, 
             String startingComponent) {
                 
-        
         knowledge.addSetups(setups);
         knowledge.addExperiments(experiments);
         knowledge.addTransitionRules(rules);
         knowledge.addPopulationSplits(populationSplits);
         knowledge.addPipelines(pipelines);
         
-        
         var currentComponent = this.knowledge.getComponent(startingComponent);
         currentComponent.handleComponentInPipeline(this);
-    }
-
-    
-    public void handleComponent(Experiment<?> experiment) {
-
-        // When this method is called, no previous experiment has been started yet
-        // TODO verify this is still true at the end of the implementation
-        this.knowledge.setCurrentExperiment(experiment);
-
-        // Start the experiment
-        this.startExperiment();
-
-        // Do not deploy new setup if the previous component is an experiment with the same setup
-        // if (this.currentComponent instanceof Experiment && 
-        //         ((Experiment<?>) (this.currentComponent)).getSetup().equals(experiment.getSetup())) {
-        //     // Do nothing
-        // } else {
-        //     int networkPort = Networking.generateAvailableNetworkPort();
-        //     var commands = experiment.getStartCommands(this.pipelineComponents.setups.stream()
-        //         .filter(s -> s.getName().equals(experiment.getSetup())).findFirst().orElseThrow(), networkPort);
-        
-        //     PipelineRunner.executeCommands(commands);
-        // }
-    }
-
-
-
-    public void handleComponent(ABComponent component) {
-        throw new RuntimeException(String.format("'handleComponent' method not implemented yet for component of type %s", 
-            component.getClass().getName()));
-    }
-
-
-
-    
-    public void setActiveExperiment(Experiment<?> experiment) {
-        this.knowledge.setCurrentExperiment(experiment);
-    }
-
-
-    public void startExperiment(Experiment<?> experiment) {
-        this.startExperiment(experiment, false);    
-    }
-
-
-    public void startExperiment(Experiment<?> experiment, boolean blockThread) {
-        // Start the experiment
-        this.startExperiment();
 
         this.service.scheduleAtFixedRate(this::triggerAdaptationCycle, Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, 
             Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, TimeUnit.SECONDS);
         
-        this.isActive = true;
 
         if (blockThread) {
             try {
@@ -178,33 +129,12 @@ public class FeedbackLoop {
 
 
 
-    private void startSetup(Setup setup) {
-        // Handling the setup
-        knowledge.setCurrentSetup(setup);
-        knowledge.setABComponentName(setup.getABComponent().serviceName());
-
-        int port = this.effector.deploySetup(setup.getName());
-        knowledge.setExposedPort(port, setup.getABComponent().serviceName());
-        knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Setup, setup.getName()));
-    }
-
-    private void stopSetup() {
-        this.knowledge.getCurrentExperiment().ifPresent(s -> {
-            this.effector.removeSetup(s.getName());
-            this.knowledge.setCurrentSetup(null);
-            this.knowledge.setABComponentName(null);
-            this.knowledge.removeExposedPort(s.getName());
-        });
-    }
-
-    /**
-     * Prepare the feedback loop and the underlying MAPE components for a new experiment
-     */
-    public void startExperiment() {
-        var currentExperiment = this.knowledge.getCurrentExperiment().get();
+    public void handleComponent(Experiment<?> experiment) {
+        // Start the experiment
+        this.knowledge.setCurrentExperiment(experiment);
 
         Setup experimentSetup = this.knowledge.getSetups().stream()
-            .filter(s -> s.getName().equals(currentExperiment.getSetup()))
+            .filter(s -> s.getName().equals(experiment.getSetup()))
             .findFirst().orElseThrow();
 
 
@@ -225,7 +155,7 @@ public class FeedbackLoop {
 
 
 
-        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Experiment, currentExperiment.getName()));
+        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Experiment, experiment.getName()));
         this.knowledge.clearSamples();
 
         // Make sure that the locust process is not running anymore
@@ -237,8 +167,8 @@ public class FeedbackLoop {
 
         // Set the AB routing of the AB-component according to the current experiment
         this.effector.setABRouting(this.knowledge.getABComponentName(), 
-            currentExperiment.getABSetting().getWeightA(), 
-            currentExperiment.getABSetting().getWeightB());
+            experiment.getABSetting().getWeightA(), 
+            experiment.getABSetting().getWeightB());
 
 
         // Clear the history in the AB component
@@ -249,9 +179,9 @@ public class FeedbackLoop {
 
 
 
-        var locustUsers = currentExperiment.getUserProfile().getLocustUsers();
-        int totalAmountUsers = currentExperiment.getUserProfile().getNumberOfUsers();
-        int weightA = currentExperiment.getABSetting().getWeightA();
+        var locustUsers = experiment.getUserProfile().getLocustUsers();
+        int totalAmountUsers = experiment.getUserProfile().getNumberOfUsers();
+        int weightA = experiment.getABSetting().getWeightA();
         int middlePoint = (int) (weightA * totalAmountUsers / 100.0);
         int currentIndex = 1;
 
@@ -282,13 +212,40 @@ public class FeedbackLoop {
             }
         });
         
-        this.service.scheduleAtFixedRate(this::triggerAdaptationCycle, Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, 
-            Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, TimeUnit.SECONDS);
-        
         this.isActive = true;
     }
 
+        
 
+    
+    public void handleComponent(ABComponent component) {
+        throw new RuntimeException(String.format("'handleComponent' method not implemented yet for component of type %s", 
+            component.getClass().getName()));
+    }
+
+
+
+    private void startSetup(Setup setup) {
+        // Handling the setup
+        knowledge.setCurrentSetup(setup);
+        knowledge.setABComponentName(setup.getABComponent().serviceName());
+
+        int port = this.effector.deploySetup(setup.getName());
+        knowledge.setExposedPort(port, setup.getABComponent().serviceName());
+        knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Setup, setup.getName()));
+    }
+
+    private void stopSetup() {
+        this.knowledge.getCurrentExperiment().ifPresent(s -> {
+            this.effector.removeSetup(s.getName());
+            this.knowledge.setCurrentSetup(null);
+            this.knowledge.setABComponentName(null);
+            this.knowledge.removeExposedPort(s.getName());
+        });
+    }
+
+
+    
     public void stopLocustRunners() {
         this.locustRunners.stream()
             .filter(LocustRunner::isRunning)
@@ -381,10 +338,6 @@ public class FeedbackLoop {
             executor.execute();
         }
     }
-
-
-
-
 
 
 

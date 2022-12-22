@@ -43,6 +43,6 @@ public class Planner {
         
         this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Rule, rule.getName()));
         
-        this.knowledge.setNextExperimentName(rule.getToExperiment());
+        this.knowledge.setNextComponentName(rule.getToComponent());
     }    
 }
