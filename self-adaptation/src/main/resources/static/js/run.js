@@ -196,6 +196,7 @@ function addSplitCollapsible(rootElement, split) {
             ${['Name:', `${split['name']}`, 
                'Pipeline 1:', `${split['pipelineName1']}`, 
                'Pipeline 2:', `${split['pipelineName2']}`,
+               'Next component:', `${split['nextComponent']}`,
                'Component:', `${split['splitComponent']['imageName']}`]
                    .map(x => `<div>${x}</div>`).join('\n')}</div>
         </details></div>`;

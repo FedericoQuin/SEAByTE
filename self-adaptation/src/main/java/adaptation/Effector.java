@@ -85,4 +85,21 @@ public class Effector implements IEffector {
         var commands = setup.generateReverseCommandsWithReboot();
         commands.forEach(Command::execute);
     }
+
+    @Override
+    public void deployMLComponent(String populationSplitName) {
+        var populationSplit = this.feedbackLoop.getKnowledge().getPopulationSplit(populationSplitName);
+        var commands = populationSplit.getStartCommands();
+        logger.info(String.format("Deploying Machine Learning component '%s' in the underlying application... (%d commands)", 
+            populationSplitName, commands.size()));
+        commands.forEach(Command::execute);
+    }
+
+    @Override
+    public void removeMLComponent(String populationSplitName) {
+        var populationSplit = this.feedbackLoop.getKnowledge().getPopulationSplit(populationSplitName);
+
+        logger.info(String.format("Removing Machine Learning component '%s' from the underlying application...", populationSplitName));
+        populationSplit.getStopCommands().forEach(Command::execute);
+    }
 }

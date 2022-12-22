@@ -30,4 +30,9 @@ public interface IEffector {
      * @param setupName The name of the setup to be undeployed.
      */
     void removeSetup(String setupName);
+
+
+    void deployMLComponent(String populationSplitName);
+
+    void removeMLComponent(String populationSplitName);
 }

@@ -3,6 +3,7 @@ package adaptation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -51,9 +52,18 @@ public class FeedbackLoop {
     // The runners which emulate the specified User profile
     private List<LocustRunner> locustRunners;
 
+    private boolean blockDuringExecution;
+
+    private final int id;
+    private static int nextId = 0;
+
 
 
     public FeedbackLoop() {
+        this(false);
+    }
+
+    public FeedbackLoop(boolean blockDuringExecution) {
         this.knowledge = new Knowledge();
 
         this.monitor = new Monitor(this);
@@ -67,6 +77,9 @@ public class FeedbackLoop {
         this.isActive = false;
         this.service = Executors.newSingleThreadScheduledExecutor();
         this.locustRunners = new ArrayList<>();
+
+        this.blockDuringExecution = blockDuringExecution;
+        this.id = FeedbackLoop.nextId++;
     }
 
 
@@ -75,7 +88,6 @@ public class FeedbackLoop {
     }
 
     public void initializeFeedbackLoop(Pipeline pipeline, ABRepository repository) {
-        
         Set<Experiment<?>> experiments = pipeline.getExperiments().stream()
             .map(e -> repository.getExperiment(e))
             .collect(Collectors.toSet());
@@ -113,14 +125,13 @@ public class FeedbackLoop {
         knowledge.addPopulationSplits(populationSplits);
         knowledge.addPipelines(pipelines);
         
-        var currentComponent = this.knowledge.getComponent(startingComponent);
+        var currentComponent = this.knowledge.getComponent(startingComponent).get();
         currentComponent.handleComponentInPipeline(this);
 
         this.service.scheduleAtFixedRate(this::triggerAdaptationCycle, Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, 
             Constants.FEEDBACK_LOOP_POLLING_FREQUENCY, TimeUnit.SECONDS);
         
-
-        if (blockThread) {
+        if (this.blockDuringExecution) {
             try {
                 this.service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
             } catch (InterruptedException e) {} // TODO handle this exception?
@@ -130,6 +141,15 @@ public class FeedbackLoop {
 
 
     public void handleComponent(Experiment<?> experiment) {
+        this.knowledge.clearSamples();
+
+        // Make sure that the locust process is not running anymore
+        this.stopLocustRunners();
+
+        // Stop the polling of the AB component
+        this.monitor.stopPolling();
+
+
         // Start the experiment
         this.knowledge.setCurrentExperiment(experiment);
 
@@ -154,17 +174,6 @@ public class FeedbackLoop {
             });
 
 
-
-        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Experiment, experiment.getName()));
-        this.knowledge.clearSamples();
-
-        // Make sure that the locust process is not running anymore
-        this.stopLocustRunners();
-
-        // Stop the polling of the AB component
-        this.monitor.stopPolling();
-
-
         // Set the AB routing of the AB-component according to the current experiment
         this.effector.setABRouting(this.knowledge.getABComponentName(), 
             experiment.getABSetting().getWeightA(), 
@@ -174,6 +183,8 @@ public class FeedbackLoop {
         // Clear the history in the AB component
         this.effector.clearABComponentHistory(this.knowledge.getABComponentName());
         
+        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Experiment, experiment.getName()));
+
         // Restart the polling of the AB component
         this.monitor.startPolling();
 
@@ -216,6 +227,103 @@ public class FeedbackLoop {
     }
 
         
+    public void handleComponent(PopulationSplit split) {
+        this.monitor.stopPolling();
+        this.isActive = false;
+        
+        // Stop any currently deployed setup before starting the pipelines
+        this.knowledge.getCurrentSetup().ifPresent(s -> this.stopSetup());
+        this.knowledge.setCurrentExperiment(null);
+
+        // Start the split component that will be used by the sub-pipelines
+        this.effector.deployMLComponent(split.getName());
+        this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Split, split.getName()));
+
+        // Add the configuration parameters for the split component to the setups in the pipelines 
+        //  --> adjust the setups to take the ML component into account
+        // FIXME adjust environment variable to correct name later
+        Map<String, String> newParam = Map.of("ML_COMPONENT_NAME", split.getSplitComponent().serviceName());
+        Set<Setup> customSetups = this.knowledge.getSetups().stream()
+            .map(s -> new Setup(s, newParam))
+            .collect(Collectors.toSet());
+
+        this.logger.info("Retrieving both pipelines from the knowledge.");
+
+        Pipeline pipeline1 = this.knowledge.getPipeline(split.getPipelineName1());
+        Pipeline pipeline2 = this.knowledge.getPipeline(split.getPipelineName2());
+
+        this.logger.info("Creating threads for the parallel A/B pipelines");
+        
+        Thread t1 = this.createThreadPipelineExecution(pipeline1, this.retrievePipelineComponents(pipeline1, customSetups));
+        Thread t2 = this.createThreadPipelineExecution(pipeline2, this.retrievePipelineComponents(pipeline2, customSetups));
+
+        this.logger.info("Created both threads for the split component");
+
+        t1.start();
+        t2.start();
+
+        this.logger.info("Started both threads.");
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            // Should not get here, otherwise problem for cleaning up
+            Logger.getLogger(Planner.class.getName()).severe("Thread interupted during parallel pipeline execution.");
+            throw new RuntimeException("Sub-pipeline interrupted during execution, cannot clean up deployed components.");
+        } finally {
+            this.effector.removeMLComponent(split.getName());
+            // TODO other cleanup necessary?
+        }
+
+        this.knowledge.getComponent(split.getNextComponent()).ifPresentOrElse(
+            c -> c.handleComponentInPipeline(this), 
+            () -> this.stopFeedbackLoop());
+    }
+
+    private Thread createThreadPipelineExecution(Pipeline pipeline, PipelineComponents components) {
+        return new Thread(() -> {
+            Logger.getAnonymousLogger().info("[Thread started]");
+            if (pipeline == null) {
+                return;
+            }
+
+            // Construct a new Feedbackloop with the first pipeline to be executed
+            FeedbackLoop feedbackLoop = new FeedbackLoop(true);
+            feedbackLoop.initializeFeedbackLoop(components.setups(), components.experiments(), components.rules(), 
+                components.populationSplits(), components.pipelines(), pipeline.getStartingComponent());
+
+            feedbackLoop.stopFeedbackLoop(true);
+            // TODO add history somewhere
+        });
+    }
+
+
+    private PipelineComponents retrievePipelineComponents(Pipeline pipeline, Set<Setup> customSetups) {
+        if (pipeline == null) {
+            return null;
+        }
+
+        Set<Experiment<?>> experiments = pipeline.getExperiments().stream()
+            .map(e -> this.knowledge.getExperiment(e))
+            .collect(Collectors.toSet());
+        var setupNames = experiments.stream().map(Experiment::getSetup).toList();
+
+        return new PipelineComponents(
+            customSetups.stream().filter(s -> setupNames.contains(s.getName())).collect(Collectors.toSet()), 
+            experiments, 
+            pipeline.getTransitionRules().stream()
+                .map(r -> this.knowledge.getTransitionRule(r))
+                .collect(Collectors.toSet()), 
+            pipeline.getPopulationSplits().stream()
+                .map(s -> this.knowledge.getPopulationSplit(s))
+                .collect(Collectors.toSet()), 
+            pipeline.getPipelines().stream()
+                .map(p -> this.knowledge.getPipeline(p))
+                .collect(Collectors.toSet())
+        );
+    }
+
 
     
     public void handleComponent(ABComponent component) {
@@ -276,6 +384,10 @@ public class FeedbackLoop {
 
 
 
+    public int getId() {
+        return this.id;
+    }
+
     public Optional<Setup> getDeployedSetup() {
         return this.knowledge.getCurrentSetup();
     }
@@ -325,6 +437,10 @@ public class FeedbackLoop {
 
 
     public void triggerAdaptationCycle() {
+        if (!this.isActive()) {
+            return;
+        }
+
         monitor.monitor();
 
         boolean shouldAdapt = analyzer.analyze();

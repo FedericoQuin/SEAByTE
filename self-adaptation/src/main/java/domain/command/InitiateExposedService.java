@@ -116,6 +116,11 @@ public class InitiateExposedService extends Command {
             return this;
         }
 
+        public InitiateExposedServiceBuilder withEnvironmentVariables(Map<String, String> extraParams) {
+            extraParams.entrySet().forEach(e -> this.withEnvironmentVariable(e.getKey(), e.getValue()));
+            return this;
+        }
+
 
         public InitiateExposedService build() {
             return new InitiateExposedService(this);

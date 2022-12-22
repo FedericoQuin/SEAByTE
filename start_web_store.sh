@@ -15,6 +15,6 @@ fi
 ./scripts/swarm_run.sh
 
 
-./scripts/wait-for-it.sh -t 120 localhost:8080
-./scripts/generate_test_data.sh
+./scripts/wait-for-it.sh -t 120 localhost:8080 -- \
+	./scripts/generate_test_data.sh
 

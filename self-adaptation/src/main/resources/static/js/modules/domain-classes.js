@@ -140,10 +140,11 @@ export class TransitionRule {
 
 
 export class PopulationSplit {
-    constructor(name, pipelineName1, pipelineName2, splitComponent) {
+    constructor(name, pipelineName1, pipelineName2, nextComponent, splitComponent) {
         this.name = name;
         this.pipelineName1 = pipelineName1;
         this.pipelineName2 = pipelineName2;
+        this.nextComponent = nextComponent;
         this.splitComponent = splitComponent;
     }
 }

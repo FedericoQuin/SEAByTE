@@ -230,7 +230,7 @@ public class Knowledge {
     }
 
     public Pipeline getPipeline(String name) {
-        return this.pipelines.stream().filter(p -> p.getName().equals(name)).findFirst().orElseThrow();
+        return this.pipelines.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
     }
 
 
@@ -258,10 +258,10 @@ public class Knowledge {
 
 
 
-    public ABComponent getComponent(String name) {
+    public Optional<ABComponent> getComponent(String name) {
         return Stream.concat(this.experiments.stream(), this.populationSplits.stream())
             .filter(c -> c.getName().equals(name))
-            .findFirst().orElseThrow();
+            .findFirst();
     }
 
 

@@ -19,7 +19,6 @@ public class Executor {
         knowledge.getNextComponent().ifPresentOrElse(c -> {
             c.handleComponentInPipeline(this.feedbackLoop);
         }, () -> {
-            knowledge.setCurrentExperiment(null);
             this.feedbackLoop.stopFeedbackLoop();
         });
     }

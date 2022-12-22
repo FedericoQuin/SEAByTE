@@ -1,9 +1,12 @@
 package domain.setup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,6 +26,9 @@ public class Setup {
     private NewService abComponent;
     private String serviceToRemove;
 
+    // Extra parameters that should be passed onto the AB component
+    private Map<String, String> extraParamsAB;
+
     @JsonIgnore
     private NewService removedService;
 
@@ -31,14 +37,27 @@ public class Setup {
 
 
     public Setup(String name, NewService versionA, NewService versionB, NewService abComponent, String toRemove) {
+        this(name, versionA, versionB, abComponent, toRemove, Setup.findServiceToBeRemoved(toRemove).orElse(null), new HashMap<>());
+    }
+    
+    public Setup(Setup other, Map<String, String> extraParamsAB) {
+        this(other.name, other.versionA, other.versionB, other.abComponent, other.serviceToRemove, other.removedService,
+            Stream.concat(other.extraParamsAB.entrySet().stream(), extraParamsAB.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+    
+    public Setup(String name, NewService versionA, NewService versionB, NewService abComponent, String toRemove, 
+            NewService removedService, Map<String, String> extraParamsAB) {
         this.name = name;
         this.versionA = versionA;
         this.versionB = versionB;
         this.abComponent = abComponent;
         this.serviceToRemove = toRemove;
 
-        this.removedService = this.findServiceToBeRemoved().orElse(null);
+        this.removedService = removedService;
+        this.extraParamsAB = extraParamsAB;
     }
+
 
     public String getName() {
         return this.name;
@@ -60,7 +79,7 @@ public class Setup {
         return this.serviceToRemove;
     }
 
-    private Optional<NewService> findServiceToBeRemoved() {
+    private static Optional<NewService> findServiceToBeRemoved(String removeService) {
         // Look for the service that corresponds to the service that will be removed
         for (String service : new RetrieveRunningServices().execute().get().split("\n")) {
             if (!service.contains("\t")) {
@@ -70,9 +89,9 @@ public class Setup {
             String name = service.split("\t")[0].replace(Constants.STACK_NAME, ""); // .replace("WS_", "")
             String image = service.split("\t")[1];
 
-            if (name.equals(this.getRemoveService())) {
-                this.logger.info(String.format("Found a match of service that will be removed: %s | %s", name, image));
-                return Optional.of(new NewService(this.getRemoveService(), image));
+            if (name.equals(removeService)) {
+                Logger.getLogger(Setup.class.getName()).info(String.format("Found a match of service that will be removed: %s | %s", name, image));
+                return Optional.of(new NewService(removeService, image));
             }
         }
         return Optional.empty();
@@ -116,6 +135,7 @@ public class Setup {
                 .withEnvironmentVariable("AB_COMPONENT_NAME", this.getName())
                 .withEnvironmentVariable("VERSIONA", serviceA.serviceName())
                 .withEnvironmentVariable("VERSIONB", serviceB.serviceName())
+                .withEnvironmentVariables(this.extraParamsAB)
                 .build()
         );
         
