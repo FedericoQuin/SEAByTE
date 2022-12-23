@@ -2,7 +2,7 @@
 
 
 # Add executable permissions for the used shell scripts during building
-chmod u+x ./web-store/scripts/swarm_build.sh ./self-adaptation/AB-component/build_ab_component.sh
+chmod u+x ./web-store/scripts/swarm_build.sh ./self-adaptation/AB-component/build_ab_component.sh ./self-adaptation/ML-filter/build_ml_component.sh
 
 
 # Build docker images for all microservices

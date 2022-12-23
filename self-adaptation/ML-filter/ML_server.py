@@ -3,11 +3,9 @@ from flask import request
 from flask import Response
 from flask import render_template
 import math
-import requests
 import random
 from enum import Enum
 import os
-import sys
 
 PORT = 80
 AB_COMPONENT_NAME = os.environ.get('AB_COMPONENT_NAME')
@@ -147,6 +145,10 @@ def select_variant():
     response = Response(client_group.name, mimetype="text/plain")
     return response
 
+
+@app.route("/ping")
+def ping():
+    return Response("pong", mimetype="text/plain")
 
 
 
