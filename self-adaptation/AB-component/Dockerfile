@@ -8,7 +8,7 @@ RUN echo "adaptation:$AB_PASSWORD" | chpasswd
 RUN service ssh start
 
 WORKDIR /app/
-RUN npm i performance-now express
+RUN npm i performance-now express node-fetch@2
 
 # COPY ./.env /app/
 COPY ./scripts/start_nginx.sh /app/

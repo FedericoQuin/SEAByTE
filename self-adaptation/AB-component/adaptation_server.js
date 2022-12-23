@@ -1,11 +1,12 @@
 const http = require('http');
 const url = require('url');
 var now = require("performance-now");
+const fetch = require('node-fetch');
 
 
 const PORT = 80;
 const AB_COMPONENT_NAME = process.env.AB_COMPONENT_NAME;
-const ML_CONTAINER_ADRESS = process.env.ML_CONTAINER_ADRESS;
+const POPULATION_SPLIT_NAME = process.env.POPULATION_SPLIT_NAME;
 
 
 
@@ -32,7 +33,9 @@ class ClientID {
 class ABState {
     constructor() {
         this.clients = [];
-        this.assignmentFunction = ABState.MLbasedAssignmentFunction(ML_CONTAINER_ADRESS,this.variant_received);
+        this.assignmentFunction = POPULATION_SPLIT_NAME === undefined ? 
+            ABState.defaultAssignmentFunction(50, 50) : 
+            ABState.MLbasedAssignmentFunction(POPULATION_SPLIT_NAME, process.env.POPULATION_SPLIT_TARGET);
         this.waitingForVariant = false;
         this.selectedVariant = "A";
     }
@@ -51,54 +54,28 @@ class ABState {
         }
     }
 
-    static MLbasedAssignmentFunction(ml_container_adress, callback_function){
+    static MLbasedAssignmentFunction(populationSplitName, targetValue) {
         return {
+            async determineAssignment(id) {
+                let header = [];
+                header['cookie'] = `client-id=${id}`
 
-            determineAssignment(id){
-                return new Promise(function(resolve, reject) {
-                    let data = '';
-                    let h = [];
-                    h['cookie'] = `client-id=${id}`
-
-                    const ml_container_request = http.request(ml_container_adress+"/variant", {headers: {'Cookie': `client-id=${id}`}}, (r) => {
-
-                
-                        r.on('data', (chunk) => {data += chunk;
-                        });
-                        r.on('end', () => {
-                        console.log("callback_end");
-                        resolve(data.toString());
-                        });
-                    });
-    
-                    ml_container_request.on('error', (error) => {
-                        console.log("callback_error");
-                        console.error(error);
-                        res.end(error.toString());
-                        reject("A");
-                    
-                        });
-
-                    ml_container_request.end();
-                
-                    });
+                return await fetch(`http://${populationSplitName}/predict`, 
+                        {method: 'post', headers: {'Cookie': `client-id=${id}`}})
+                    .then(async response => {
+                        const res = await response.json();
+                        return res === targetValue ? 'A' : 'B'
+                    })
+                    .catch(_ => {return 'A';});
             }
 
                 
         }
     }
 
-    addClient(id) {
-
-        let state =  this;
-        return new Promise(function(resolve, reject) {
-        let variant = state.assignmentFunction.determineAssignment(id);
-        variant.then((value) => {state.clients.push(new ClientID(id,  value));
-            console.log("add done");
-            resolve();}).catch(error => {console.info(error.message)
-            reject(error)});
-        })
-        
+    async addClient(id) {
+        const variant = await this.assignmentFunction.determineAssignment(id);
+        this.clients.push(new ClientID(id, variant));
     }
 
     hasClient(clientId) {
@@ -265,7 +242,7 @@ function handleAdaptationFunctions(req, res, requested_url) {
 
 
 
-const requestListener = function (req, res) {
+const requestListener = async function (req, res) {
     // Make distinction between adaptation requests and regular requests
     const requested_url = url.parse(req.url);
     if (requested_url.pathname.includes('/adaptation')) { 
@@ -296,64 +273,54 @@ const requestListener = function (req, res) {
 
     if (!state.hasClient(client_id)) {
         // Add the client-id to one of the scenarios
-        let promise = state.addClient(client_id);
-        promise.then(()=>{pass_internal_request(req, h, has_client_id, client_id, res);}).catch(error => console.info(error.message));
+        await state.addClient(client_id);
     }
-    else{
-        pass_internal_request(req, h, has_client_id, client_id,res);
-    }
-
-    
-
-
-
-    
+    pass_internal_request(req, h, has_client_id, client_id, res);
 }
 
-function pass_internal_request(req, h, has_client_id, client_id,res){
+
+
+function pass_internal_request(req, headers, has_client_id, client_id,res) {
     const client_group = state.getGroup(client_id);
-    h['cookie'] += `; scenario${client_group.name}_${AB_COMPONENT_NAME}=true`;
-    // `http://localhost:${PORT}${req.url}`,
+    headers['cookie'] += `; scenario${client_group.name}_${AB_COMPONENT_NAME}=true`;
 
-    
-        if (!has_client_id) {
-            const current_cookies = res.getHeader('set-cookie'); 
-            res.setHeader('set-cookie', (current_cookies == undefined ? '' : current_cookies) + `client-id=${client_id}`);
+    if (!has_client_id) {
+        const current_cookies = res.getHeader('set-cookie'); 
+        res.setHeader('set-cookie', (current_cookies == undefined ? '' : current_cookies) + `client-id=${client_id}`);
+    }
+    const starting_time = now();
+
+
+    const internal_request = http.request(`http://localhost:${PORT}${req.url}`, {
+            headers: headers, method: req.method}, 
+            (response) => {
+        const response_headers = response.headers;
+
+        for (const [key, value] of Object.entries(response_headers)) {
+            res.setHeader(key, value);
         }
-        const starting_time = now();
-    
-    
-        const internal_request = http.request(`http://localhost:${PORT}${req.url}`, {headers: h, method: req.method}, (r) => {
 
-        
+        let data = '';
+        response.on('data', (chunk) => {data += chunk;});
+        response.on('end', () => {
+            const ending_time = now();
+            const duration = ending_time - starting_time;
 
-            const response_headers = r.headers;
-
-            for (const [key, value] of Object.entries(response_headers)) {
-                res.setHeader(key, value);
+            if (client_group == Variant.A) {
+                historyA.push(new TimingRequest(starting_time, duration, client_id, requested_url.pathname));
+            } else if (client_group == Variant.B) {
+                historyB.push(new TimingRequest(starting_time, duration, client_id, requested_url.pathname));
             }
-
-            let data = '';
-            r.on('data', (chunk) => {data += chunk;});
-            r.on('end', () => {
-                const ending_time = now();
-                const duration = ending_time - starting_time;
-
-                if (client_group == Variant.A) {
-                    historyA.push(new TimingRequest(starting_time, duration, client_id, requested_url.pathname));
-                } else if (client_group == Variant.B) {
-                    historyB.push(new TimingRequest(starting_time, duration, client_id, requested_url.pathname));
-                }
-                res.end(data);
-            });
+            res.end(data);
         });
-    
-        internal_request.on('error', (error) => {
-            console.error(error);
-            res.end(error.toString());
-        });
+    });
 
-        internal_request.end();
+    internal_request.on('error', (error) => {
+        console.error(error);
+        res.end(error.toString());
+    });
+
+    internal_request.end();
 
 }
 
