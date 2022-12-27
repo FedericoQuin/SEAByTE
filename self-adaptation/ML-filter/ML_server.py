@@ -1,4 +1,4 @@
-from flask import Flask, Response, request
+from flask import Flask, Response, request, jsonify
 import os
 import random
 from PurchasePrediction import PurchasePrediction
@@ -28,7 +28,7 @@ def make_prediction():
     result = ml_model.predict([[random.uniform(0, 1), random.uniform(0, 5), random.uniform(0, 10)]])
     
     # Return the result
-    return str(result[0])
+    return jsonify(result[0])
 
 
 @app.route('/ping')
