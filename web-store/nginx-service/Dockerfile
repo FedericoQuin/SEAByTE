@@ -6,7 +6,7 @@ RUN apt install -y sudo openssh-server sshpass python3
 RUN useradd -rm -d /home/adaptation -s /bin/bash -g root -G sudo -u 1001 adaptation
 RUN echo "adaptation:debug" | chpasswd
 # For debugging
-# RUN service ssh start
+#RUN service ssh start
 
 COPY ./.env /app/
 COPY ./scripts/start_nginx.sh /app/
@@ -33,4 +33,4 @@ CMD ./wait-for-it.sh -t 60 ws-webapp-service:80 -- \
 	./start_nginx.sh
 
 EXPOSE 80
-# EXPOSE 22
+#EXPOSE 22

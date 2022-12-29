@@ -20,7 +20,6 @@ public class Networking {
                 portNumber = Networking.tryNetworkPort();
             } catch (IOException e) {}
         }
-
         return portNumber;
     }
 }
