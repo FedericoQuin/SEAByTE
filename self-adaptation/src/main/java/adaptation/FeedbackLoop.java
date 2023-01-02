@@ -124,7 +124,7 @@ public class FeedbackLoop {
         knowledge.addTransitionRules(rules);
         knowledge.addPopulationSplits(populationSplits);
         knowledge.addPipelines(pipelines);
-        
+
         var currentComponent = this.knowledge.getComponent(startingComponent).get();
         currentComponent.handleComponentInPipeline(this);
 
@@ -138,7 +138,7 @@ public class FeedbackLoop {
         }
     }
 
-
+    
 
     public void handleComponent(Experiment<?> experiment) {
         this.knowledge.clearSamples();
@@ -226,7 +226,7 @@ public class FeedbackLoop {
         this.isActive = true;
     }
 
-        
+
     public void handleComponent(PopulationSplit split) {
         this.monitor.stopPolling();
         this.isActive = false;

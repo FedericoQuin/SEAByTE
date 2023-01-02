@@ -179,9 +179,9 @@ window.populateSplits = () => {
                 addSplitCollapsible(splitList, split);
             }
         }
-
+        
     })();
-    }
+}
 
 function addSplitCollapsible(rootElement, split) {
     rootElement.innerHTML += `\n<div class="grid-item-margin">

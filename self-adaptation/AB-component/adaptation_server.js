@@ -61,10 +61,10 @@ class DefaultAssignmentFunction extends AssignmentFunction {
     }
 
     async determineAssignment(_) {
-                let variant = (this.progress % 100) < this.weightA ? Variant.A : Variant.B;
-                this.progress += Math.min(this.weightA, this.weightB);
-                return variant;
-            }
+        let variant = (this.progress % 100) < this.weightA ? Variant.A : Variant.B;
+        this.progress += Math.min(this.weightA, this.weightB);
+        return variant;
+    }
 
     getWeightA() {
         return this.weightA;
@@ -133,7 +133,7 @@ class LimitedAssignmentFunction extends AssignmentFunction {
         this.weightB = newB;
         clients.forEach(c => c.group = this.determineAssignment(c.id));
     }
-        }
+}
 
 class PopulationSplitAssignmentFunction extends AssignmentFunction {
     constructor(populationSplitName, targetValue, assignmentFunction) {
@@ -143,27 +143,27 @@ class PopulationSplitAssignmentFunction extends AssignmentFunction {
         this.assignmentFunction = assignmentFunction;
     }
 
-            async determineAssignment(id) {
-                let header = [];
-                header['cookie'] = `client-id=${id}`
+    async determineAssignment(id) {
+        let header = [];
+        header['cookie'] = `client-id=${id}`
 
         return await fetch(`http://${this.populationSplitName}/predict`, 
-                        {method: 'post', headers: {'Cookie': `client-id=${id}`}})
+                {method: 'post', headers: {'Cookie': `client-id=${id}`}})
             .then((response) => response.json())
             .then((res) => {
                 // If the predicted value is not the value we desire, the user should not participate in the A/B test
                 return res === this.targetValue ? this.assignmentFunction.determineAssignment(id) : Variant.NULL;
-                    })
+            })
             .catch(_ => {return this.assignmentFunction.determineAssignment(id);});
-            }
+    }
 
     getWeightA() {
         return this.assignmentFunction.getWeightA();
     }
-                
+
     getWeightB() {
         return this.assignmentFunction.getWeightB();
-        }
+    }
 
     reassignUsers(newA, newB, clients) {
         this.assignmentFunction.reassignUsers(newA, newB, clients);
