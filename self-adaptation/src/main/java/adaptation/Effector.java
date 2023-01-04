@@ -87,7 +87,7 @@ public class Effector implements IEffector {
     }
 
     @Override
-    public void deployMLComponent(String populationSplitName) {
+    public void deploySplitComponent(String populationSplitName) {
         var populationSplit = this.feedbackLoop.getKnowledge().getPopulationSplit(populationSplitName);
         var commands = populationSplit.getStartCommands();
         logger.info(String.format("Deploying Machine Learning component '%s' in the underlying application... (%d commands)", 
@@ -96,7 +96,7 @@ public class Effector implements IEffector {
     }
 
     @Override
-    public void removeMLComponent(String populationSplitName) {
+    public void removeSplitComponent(String populationSplitName) {
         var populationSplit = this.feedbackLoop.getKnowledge().getPopulationSplit(populationSplitName);
 
         logger.info(String.format("Removing Machine Learning component '%s' from the underlying application...", populationSplitName));

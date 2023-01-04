@@ -32,7 +32,7 @@ public interface IEffector {
     void removeSetup(String setupName);
 
 
-    void deployMLComponent(String populationSplitName);
+    void deploySplitComponent(String populationSplitName);
 
-    void removeMLComponent(String populationSplitName);
+    void removeSplitComponent(String populationSplitName);
 }

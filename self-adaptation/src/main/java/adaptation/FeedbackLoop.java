@@ -236,33 +236,18 @@ public class FeedbackLoop {
         this.knowledge.setCurrentExperiment(null);
 
         // Start the split component that will be used by the sub-pipelines
-        this.effector.deployMLComponent(split.getName());
+        this.effector.deploySplitComponent(split.getName());
         this.knowledge.addToHistory(new WorkflowStep(WorkflowStepType.Split, split.getName()));
 
-        // Add the configuration parameters for the split component to the setups in the pipelines 
-        //  --> adjust the setups to take the ML component into account
-        // FIXME adjust environment variable to correct name later
-        Map<String, String> newParam = Map.of("ML_COMPONENT_NAME", split.getSplitComponent().serviceName());
-        Set<Setup> customSetups = this.knowledge.getSetups().stream()
-            .map(s -> new Setup(s, newParam))
-            .collect(Collectors.toSet());
+        Thread t1 = this.generatePipelineThread(split.getSplitComponent().serviceName(), split.getPipelineName1(), split.getTargetValue1());
+        Thread t2 = this.generatePipelineThread(split.getSplitComponent().serviceName(), split.getPipelineName2(), split.getTargetValue2());
 
-        this.logger.info("Retrieving both pipelines from the knowledge.");
-
-        Pipeline pipeline1 = this.knowledge.getPipeline(split.getPipelineName1());
-        Pipeline pipeline2 = this.knowledge.getPipeline(split.getPipelineName2());
-
-        this.logger.info("Creating threads for the parallel A/B pipelines");
-        
-        Thread t1 = this.createThreadPipelineExecution(pipeline1, this.retrievePipelineComponents(pipeline1, customSetups));
-        Thread t2 = this.createThreadPipelineExecution(pipeline2, this.retrievePipelineComponents(pipeline2, customSetups));
-
-        this.logger.info("Created both threads for the split component");
+        this.logger.info("Created both threads for the split component.");
 
         t1.start();
         t2.start();
 
-        this.logger.info("Started both threads.");
+        this.logger.info("Starting both threads.");
 
         try {
             t1.join();
@@ -272,13 +257,31 @@ public class FeedbackLoop {
             Logger.getLogger(Planner.class.getName()).severe("Thread interupted during parallel pipeline execution.");
             throw new RuntimeException("Sub-pipeline interrupted during execution, cannot clean up deployed components.");
         } finally {
-            this.effector.removeMLComponent(split.getName());
+            this.effector.removeSplitComponent(split.getName());
             // TODO other cleanup necessary?
         }
 
         this.knowledge.getComponent(split.getNextComponent()).ifPresentOrElse(
             c -> c.handleComponentInPipeline(this), 
             () -> this.stopFeedbackLoop());
+    }
+
+    private Thread generatePipelineThread(String splitServiceName, String pipelineName, double targetValue) {
+        // Add the configuration parameters for the split component to the setups in the pipeline 
+        //  --> adjust the setups to take the split component into account
+        Map<String, String> newParam = Map.of(
+            "POPULATION_SPLIT_NAME", splitServiceName,
+            "POPULATION_SPLIT_TARGET", Double.toString(targetValue)
+        );
+        Set<Setup> customSetups = this.knowledge.getSetups().stream()
+            .map(s -> new Setup(s, newParam))
+            .collect(Collectors.toSet());
+
+        this.logger.info("Retrieving pipeline from the knowledge.");
+        Pipeline pipeline = this.knowledge.getPipeline(pipelineName);
+
+        this.logger.info("Creating thread for the parallel A/B pipeline.");
+        return this.createThreadPipelineExecution(pipeline, this.retrievePipelineComponents(pipeline, customSetups));
     }
 
     private Thread createThreadPipelineExecution(Pipeline pipeline, PipelineComponents components) {

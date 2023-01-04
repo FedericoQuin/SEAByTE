@@ -86,7 +86,7 @@ public class Setup {
                 continue;
             }
 
-            String name = service.split("\t")[0].replace(Constants.STACK_NAME, ""); // .replace("WS_", "")
+            String name = service.split("\t")[0].replace(String.format("%s%s", Constants.STACK_PREFIX, Constants.STACK_PREFIX_SEPARATOR), ""); // .replace("WS_", "")
             String image = service.split("\t")[1];
 
             if (name.equals(removeService)) {
@@ -117,18 +117,18 @@ public class Setup {
 
 
         // Add services that do not overlap with the decommissioned service first
-        commands.add(new InitiateService(String.format("%s%s", Constants.STACK_NAME, serviceA.serviceName()), 
+        commands.add(new InitiateService(Constants.generateStackName(serviceA.serviceName()), 
             serviceA.serviceName(), serviceA.imageName(), 80, Constants.WS_NETWORK));
-        commands.add(new InitiateService(String.format("%s%s", Constants.STACK_NAME, serviceB.serviceName()),
+        commands.add(new InitiateService(Constants.generateStackName(serviceB.serviceName()),
             serviceB.serviceName(), serviceB.imageName(), 80, Constants.WS_NETWORK));
 
         // Decommission the existing service
-        commands.add(new RemoveService(String.format("%s%s", Constants.STACK_NAME, decommission)));
+        commands.add(new RemoveService(Constants.generateStackName(decommission)));
         
         // Add the new service that overlapped with the older one
         // In our case this is the AB-component service
         commands.add(
-            new InitiateExposedServiceBuilder(String.format("%s%s", Constants.STACK_NAME, serviceAB.serviceName()),
+            new InitiateExposedServiceBuilder(Constants.generateStackName(serviceAB.serviceName()),
                     serviceAB.serviceName(), serviceAB.imageName(), Constants.WS_NETWORK)
                 .withPort(80)
                 .withExposedPort(networkPort, Constants.AB_COMPONENT_ADAPTATION_SERVER_PORT)
@@ -147,9 +147,9 @@ public class Setup {
     public List<Command> generateReverseCommands() {
         // Remove all spawned services
         return List.of(
-            new RemoveService(String.format("%s%s", Constants.STACK_NAME, this.getVersionA().serviceName())),
-            new RemoveService(String.format("%s%s", Constants.STACK_NAME, this.getVersionB().serviceName())),
-            new RemoveService(String.format("%s%s", Constants.STACK_NAME, this.getABComponent().serviceName()))
+            new RemoveService(Constants.generateStackName(this.getVersionA().serviceName())),
+            new RemoveService(Constants.generateStackName(this.getVersionB().serviceName())),
+            new RemoveService(Constants.generateStackName(this.getABComponent().serviceName()))
         );
     }
 
@@ -157,7 +157,7 @@ public class Setup {
 
     public List<Command> generateReverseCommandsWithReboot() {
         return Stream.concat(this.generateReverseCommands().stream(), this.getRemovedService()
-            .map(s -> Stream.of(new InitiateService(String.format("%s%s", Constants.STACK_NAME, s.serviceName()),
+            .map(s -> Stream.of(new InitiateService(Constants.generateStackName(s.serviceName()),
                 s.serviceName(), s.imageName(), 80, Constants.WS_NETWORK)))
             .orElseGet(() -> {
                 this.logger.warning("Could not restore removed service: removed service not stored or found during startup.");
