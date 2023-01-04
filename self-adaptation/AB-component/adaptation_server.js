@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const PORT = 80;
 const AB_COMPONENT_NAME = process.env.AB_COMPONENT_NAME;
 const POPULATION_SPLIT_NAME = process.env.POPULATION_SPLIT_NAME;
-const POPULATION_SPLIT_TARGET = process.env.POPULATION_SPLIT_TARGET;
+const POPULATION_SPLIT_TARGET = Number(process.env.POPULATION_SPLIT_TARGET);
 
 
 class Variant {
@@ -154,7 +154,10 @@ class PopulationSplitAssignmentFunction extends AssignmentFunction {
                 // If the predicted value is not the value we desire, the user should not participate in the A/B test
                 return res === this.targetValue ? this.assignmentFunction.determineAssignment(id) : Variant.NULL;
             })
-            .catch(_ => {return this.assignmentFunction.determineAssignment(id);});
+            .catch(_ => {
+                console.error(_);
+                return Variant.NULL;
+            });
     }
 
     getWeightA() {
@@ -185,6 +188,7 @@ class ABState {
 
     async addClient(id) {
         const variant = await this.assignmentFunction.determineAssignment(id);
+        console.log(`Assigned variant ${variant.name} (NULL=${variant == Variant.NULL}) to user with ID = ${id}`);
         this.clients.push(new ClientID(id, variant));
     }
 
@@ -208,7 +212,7 @@ class ABState {
 
     adjustWeightsWithCustomAssignment(a, b, userLimit) {
         this.assignmentFunction = new LimitedAssignmentFunction(a, b, userLimit);
-        this.assignmentFunction.reassignUsers(a, b, clients);
+        this.assignmentFunction.reassignUsers(a, b, this.clients);
         this.clients.forEach(c => c.group = this.assignmentFunction.determineAssignment(c.id));
         // A and B assigment happens based on the receiver limit of users that are going to connect to the system
     }
@@ -335,7 +339,7 @@ const requestListener = async function (req, res) {
         const old_cookies = h['cookie']
         h['cookie'] = (old_cookies == undefined ? '' : old_cookies + '; ') + `client-id=${client_id}`;
     } else {
-        client_id = client_id_cookie[0][1];
+        client_id = Number(client_id_cookie[0][1]);
     }
 
     if (!state.hasClient(client_id)) {

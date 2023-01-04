@@ -18,6 +18,7 @@ COPY ./scripts/wait-for-it.sh /app/
 COPY ./nginx_template.conf /app/
 COPY ./adaptation_server.js /app/
 
+RUN ["chmod", "+x", "/app/start_nginx.sh", "/app/start_ab_component.sh", "/app/generate_nginx.sh", "/app/wait-for-it.sh"]
 
 SHELL ["/bin/bash", "-c"]
 CMD ./start_ab_component.sh
