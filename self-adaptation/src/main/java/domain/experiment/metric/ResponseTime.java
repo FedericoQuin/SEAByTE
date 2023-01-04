@@ -56,7 +56,7 @@ public class ResponseTime extends Metric<Double, Double> {
     @Override
     public String getInfoSummary(List<URLRequest> requests) {
         var relevant = this.extractRelevantData(requests);
-        return String.format("%d (average %.2fms reponse time)", relevant.size(), 
+        return String.format("%d (average %.2fms response time)", relevant.size(), 
             relevant.stream().mapToDouble(d -> d).average().orElse(0));
     }
 
