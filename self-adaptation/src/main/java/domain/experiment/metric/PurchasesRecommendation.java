@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 
 import domain.URLRequest;
 
-public class Purchases extends Metric<Boolean, Double> {
-    public Purchases() {
-        super("Purchases");
+public class PurchasesRecommendation extends Metric<Boolean, Double> {
+    public PurchasesRecommendation() {
+        super("PurchasesRecommendation");
     }
 
     @Override
@@ -28,8 +28,9 @@ public class Purchases extends Metric<Boolean, Double> {
 
         return requestsPerOrigin.entrySet().stream()
             .map(Map.Entry::getValue)
-            .flatMap(l -> IntStream.range(0, l.size() - 1)
-                .mapToObj(i -> new URLRequestPair(l.get(i), l.get(i + 1)))
+            .flatMap(l -> IntStream.range(0, l.size())
+                .mapToObj(i -> new URLRequestPair(l.get(i), i + 1 == l.size() ? 
+                        new URLRequest("/recommendation", l.get(i).getOrigin(), 0) : l.get(i + 1)))
                 .map(p -> {
                     // Three options
                     String t1 = p.req1.getTarget();

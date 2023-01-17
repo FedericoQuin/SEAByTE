@@ -83,9 +83,9 @@ window.publishDefaultExperiments = () => {
         'Standard',
         100,
         new ABAssignment(50, 50),
-        ['ResponseTime_A', 'ResponseTime_B'],
+        ['ResponseTimeRecommendation_A', 'ResponseTimeRecommendation_B'],
         new StatisticalTest(
-            new Condition('ResponseTime_A', '==', 'ResponseTime_B'),
+            new Condition('ResponseTimeRecommendation_A', '==', 'ResponseTimeRecommendation_B'),
             0.025,
             'welsh-t-test',
             'result-welsh-t-test'
@@ -99,9 +99,9 @@ window.publishDefaultExperiments = () => {
         'Standard',
         100,
         new ABAssignment(30, 70),
-        ['Clicks_A', 'Clicks_B'],
+        ['ClicksRecommendation_A', 'ClicksRecommendation_B'],
         new StatisticalTest(
-            new Condition('Clicks_A', '==', 'Clicks_B'),
+            new Condition('ClicksRecommendation_A', '==', 'ClicksRecommendation_B'),
             0.025,
             'one-proportional-test',
             'result-clicks'
@@ -115,9 +115,9 @@ window.publishDefaultExperiments = () => {
         'Standard',
         100,
         new ABAssignment(20, 80),
-        ['Purchases_A', 'Purchases_B'],
+        ['PurchasesRecommendation_A', 'PurchasesRecommendation_B'],
         new StatisticalTest(
-            new Condition('Purchases_A', '==', 'Purchases_B'),
+            new Condition('PurchasesRecommendation_A', '==', 'PurchasesRecommendation_B'),
             0.025,
             'one-proportional-test',
             'result-purchases'

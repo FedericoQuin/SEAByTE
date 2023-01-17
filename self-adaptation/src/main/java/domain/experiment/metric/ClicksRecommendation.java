@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 import domain.URLRequest;
 
-public class Clicks extends Metric<Boolean, Double> {
+public class ClicksRecommendation extends Metric<Boolean, Double> {
 
-    public Clicks() {
-        super("Clicks");
+    public ClicksRecommendation() {
+        super("ClicksRecommendation");
     }
 
     @Override
@@ -58,8 +58,8 @@ public class Clicks extends Metric<Boolean, Double> {
         var relA = this.extractRelevantData(requestsA);
         var relB = this.extractRelevantData(requestsB);
 
-        Logger.getLogger(Clicks.class.getName()).info(String.format("mean(%s_A)", this.getName()));
-        Logger.getLogger(Clicks.class.getName()).info(String.format("%f", relA.stream().filter(b -> b).count() / (double) relA.size()));
+        Logger.getLogger(ClicksRecommendation.class.getName()).info(String.format("mean(%s_A)", this.getName()));
+        Logger.getLogger(ClicksRecommendation.class.getName()).info(String.format("%f", relA.stream().filter(b -> b).count() / (double) relA.size()));
 
         return Map.of(
             String.format("mean(%s_A)", this.getName()),

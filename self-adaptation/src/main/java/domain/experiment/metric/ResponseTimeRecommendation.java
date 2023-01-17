@@ -8,9 +8,9 @@ import java.util.stream.Stream;
 
 import domain.URLRequest;
 
-public class ResponseTime extends Metric<Double, Double> {
-    public ResponseTime() {
-        super("ResponseTime");
+public class ResponseTimeRecommendation extends Metric<Double, Double> {
+    public ResponseTimeRecommendation() {
+        super("ResponseTimeRecommendation");
     }
 
     @Override

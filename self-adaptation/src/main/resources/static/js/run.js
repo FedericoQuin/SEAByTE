@@ -310,10 +310,12 @@ import {Setup, Experiment, UserProfile, TransitionRule, DockerService, LocustUse
 import { sendPipelineToServer } from './pipeline.js';
 import { sendPopulationSplitToServer } from './split.js';
 
-window.experimentation = async () => {
+
+
+
+async function addDefaultPipelineSeams2022() {
 
     // Default pipeline and its subcomponents
-
     await sendSetupToServer(new Setup(
         'Recommendation_upgrade',
         new DockerService('ws-recommendation-service-1-0-0', 'ws-recommendation-service-image:1.0.0'),
@@ -339,9 +341,9 @@ window.experimentation = async () => {
         'Standard',
         100,
         new ABAssignment(50, 50),
-        ['ResponseTime_A', 'ResponseTime_B'],
+        ['ResponseTimeRecommendation_A', 'ResponseTimeRecommendation_B'],
         new StatisticalTest(
-            new Condition('ResponseTime_A', '==', 'ResponseTime_B'),
+            new Condition('ResponseTimeRecommendation_A', '==', 'ResponseTimeRecommendation_B'),
             0.025,
             'welsh-t-test',
             'result-welsh-t-test'
@@ -355,9 +357,9 @@ window.experimentation = async () => {
         'Standard',
         100,
         new ABAssignment(30, 70),
-        ['Clicks_A', 'Clicks_B'],
+        ['ClicksRecommendation_A', 'ClicksRecommendation_B'],
         new StatisticalTest(
-            new Condition('Clicks_A', '==', 'Clicks_B'),
+            new Condition('ClicksRecommendation_A', '==', 'ClicksRecommendation_B'),
             0.025,
             'one-proportional-test',
             'result-clicks'
@@ -371,9 +373,9 @@ window.experimentation = async () => {
         'Standard',
         100,
         new ABAssignment(20, 80),
-        ['Purchases_A', 'Purchases_B'],
+        ['PurchasesRecommendation_A', 'PurchasesRecommendation_B'],
         new StatisticalTest(
-            new Condition('Purchases_A', '==', 'Purchases_B'),
+            new Condition('PurchasesRecommendation_A', '==', 'PurchasesRecommendation_B'),
             0.025,
             'one-proportional-test',
             'result-purchases'
@@ -393,7 +395,7 @@ window.experimentation = async () => {
         'Upgrade v1.0.0 - v1.1.0',
         'Clicks v1.0.0 - v1.1.0',
         [new Condition('result-welsh-t-test', '==', 'reject'), 
-            new Condition('mean(ResponseTime_A)', '>=', 'mean(ResponseTime_B)')]
+            new Condition('mean(ResponseTimeRecommendation_A)', '>=', 'mean(ResponseTimeRecommendation_B)')]
     ));
 
 
@@ -402,7 +404,7 @@ window.experimentation = async () => {
         'Upgrade v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-welsh-t-test', '==', 'reject'), 
-            new Condition('mean(ResponseTime_A)', '<', 'mean(ResponseTime_B)')]
+            new Condition('mean(ResponseTimeRecommendation_A)', '<', 'mean(ResponseTimeRecommendation_B)')]
     ));
 
 
@@ -411,7 +413,7 @@ window.experimentation = async () => {
         'Clicks v1.0.0 - v1.1.0',
         'Purchases v1.0.0 - v1.1.0',
         [new Condition('result-clicks', '==', 'reject'),
-            new Condition('mean(Clicks_A)', '<=', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '<=', 'mean(ClicksRecommendation_B)')]
     ));
 
     await sendTransitionRuleToServer(new TransitionRule(
@@ -419,7 +421,7 @@ window.experimentation = async () => {
         'Clicks v1.0.0 - v1.1.0',
         'Purchases v1.0.0 - v1.1.0',
         [new Condition('result-clicks', '==', 'inconclusive'),
-            new Condition('mean(Clicks_A)', '<=', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '<=', 'mean(ClicksRecommendation_B)')]
     ));
 
     await sendTransitionRuleToServer(new TransitionRule(
@@ -427,7 +429,7 @@ window.experimentation = async () => {
         'Clicks v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-clicks', '==', 'inconclusive'),
-            new Condition('mean(Clicks_A)', '>', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '>', 'mean(ClicksRecommendation_B)')]
     ));
 
     await sendTransitionRuleToServer(new TransitionRule(
@@ -435,7 +437,7 @@ window.experimentation = async () => {
         'Clicks v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-clicks', '==', 'reject'),
-            new Condition('mean(Clicks_A)', '>', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '>', 'mean(ClicksRecommendation_B)')]
     ));
 
 
@@ -444,7 +446,7 @@ window.experimentation = async () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'reject'),
-            new Condition('mean(Purchases_A)', '<=', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '<=', 'mean(PurchasesRecommendation_B)')]
     ));
 
     await sendTransitionRuleToServer(new TransitionRule(
@@ -452,7 +454,7 @@ window.experimentation = async () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'inconclusive'),
-            new Condition('mean(Purchases_A)', '<=', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '<=', 'mean(PurchasesRecommendation_B)')]
     ));
 
     await sendTransitionRuleToServer(new TransitionRule(
@@ -460,7 +462,7 @@ window.experimentation = async () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'reject'),
-            new Condition('mean(Purchases_A)', '>', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '>', 'mean(PurchasesRecommendation_B)')]
     ));
 
     await sendTransitionRuleToServer(new TransitionRule(
@@ -468,7 +470,7 @@ window.experimentation = async () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'inconclusive'),
-            new Condition('mean(Purchases_A)', '>', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '>', 'mean(PurchasesRecommendation_B)')]
     ));
 
     await sendPipelineToServer(new Pipeline(
@@ -479,10 +481,25 @@ window.experimentation = async () => {
         [],
         'Upgrade v1.0.0 - v1.1.0'
     ));
+}
 
 
 
 
+
+
+
+
+
+window.experimentation = async () => {
+
+
+
+
+    await addDefaultPipelineSeams2022();
+
+
+    location.reload();
 }
 
 

@@ -268,7 +268,7 @@ window.addDefaultTransitionRules = () => {
         'Upgrade v1.0.0 - v1.1.0',
         'Clicks v1.0.0 - v1.1.0',
         [new Condition('result-welsh-t-test', '==', 'reject'), 
-            new Condition('mean(ResponseTime_A)', '>=', 'mean(ResponseTime_B)')]
+            new Condition('mean(ResponseTimeRecommendation_A)', '>=', 'mean(ResponseTimeRecommendation_B)')]
     ));
 
 
@@ -277,7 +277,7 @@ window.addDefaultTransitionRules = () => {
         'Upgrade v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-welsh-t-test', '==', 'reject'), 
-            new Condition('mean(ResponseTime_A)', '<', 'mean(ResponseTime_B)')]
+            new Condition('mean(ResponseTimeRecommendation_A)', '<', 'mean(ResponseTimeRecommendation_B)')]
     ));
 
 
@@ -286,7 +286,7 @@ window.addDefaultTransitionRules = () => {
         'Clicks v1.0.0 - v1.1.0',
         'Purchases v1.0.0 - v1.1.0',
         [new Condition('result-clicks', '==', 'reject'),
-            new Condition('mean(Clicks_A)', '<=', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '<=', 'mean(ClicksRecommendation_B)')]
     ));
 
     sendTransitionRuleToServer(new TransitionRule(
@@ -294,7 +294,7 @@ window.addDefaultTransitionRules = () => {
         'Clicks v1.0.0 - v1.1.0',
         'Purchases v1.0.0 - v1.1.0',
         [new Condition('result-clicks', '==', 'inconclusive'),
-            new Condition('mean(Clicks_A)', '<=', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '<=', 'mean(ClicksRecommendation_B)')]
     ));
 
     sendTransitionRuleToServer(new TransitionRule(
@@ -302,7 +302,7 @@ window.addDefaultTransitionRules = () => {
         'Clicks v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-clicks', '==', 'inconclusive'),
-            new Condition('mean(Clicks_A)', '>', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '>', 'mean(ClicksRecommendation_B)')]
     ));
 
     sendTransitionRuleToServer(new TransitionRule(
@@ -310,7 +310,7 @@ window.addDefaultTransitionRules = () => {
         'Clicks v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-clicks', '==', 'reject'),
-            new Condition('mean(Clicks_A)', '>', 'mean(Clicks_B)')]
+            new Condition('mean(ClicksRecommendation_A)', '>', 'mean(ClicksRecommendation_B)')]
     ));
 
 
@@ -319,7 +319,7 @@ window.addDefaultTransitionRules = () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'reject'),
-            new Condition('mean(Purchases_A)', '<=', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '<=', 'mean(PurchasesRecommendation_B)')]
     ));
 
     sendTransitionRuleToServer(new TransitionRule(
@@ -327,7 +327,7 @@ window.addDefaultTransitionRules = () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'inconclusive'),
-            new Condition('mean(Purchases_A)', '<=', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '<=', 'mean(PurchasesRecommendation_B)')]
     ));
 
     sendTransitionRuleToServer(new TransitionRule(
@@ -335,7 +335,7 @@ window.addDefaultTransitionRules = () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'reject'),
-            new Condition('mean(Purchases_A)', '>', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '>', 'mean(PurchasesRecommendation_B)')]
     ));
 
     sendTransitionRuleToServer(new TransitionRule(
@@ -343,6 +343,6 @@ window.addDefaultTransitionRules = () => {
         'Purchases v1.0.0 - v1.1.0',
         'end',
         [new Condition('result-purchases', '==', 'inconclusive'),
-            new Condition('mean(Purchases_A)', '>', 'mean(Purchases_B)')]
+            new Condition('mean(PurchasesRecommendation_A)', '>', 'mean(PurchasesRecommendation_B)')]
     ));
 }
