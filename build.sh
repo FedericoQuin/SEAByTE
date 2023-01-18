@@ -4,6 +4,10 @@
 # Add executable permissions for the used shell scripts during building
 chmod u+x ./web-store/scripts/swarm_build.sh ./self-adaptation/AB-component/build_ab_component.sh ./self-adaptation/ML-filter/build_ml_component.sh
 
+# Add output directory for results of A/B testing feedback loop
+mkdir -p ./self-adaptation/out/
+
+
 
 # Build docker images for all microservices
 

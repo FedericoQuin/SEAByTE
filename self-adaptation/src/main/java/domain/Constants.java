@@ -5,6 +5,8 @@ public class Constants {
     public static String STACK_PREFIX_SEPARATOR = "_";
     public static String WS_NETWORK = Constants.STACK_PREFIX + Constants.STACK_PREFIX_SEPARATOR + "custom-network";
 
+    public static String OUTPUT_DIRECTORY = "out";
+
 
 
     public static final int AB_COMPONENT_ADAPTATION_SERVER_PORT = 5000; 

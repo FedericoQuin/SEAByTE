@@ -1,11 +1,14 @@
 package adaptation.mape;
 
+import java.util.logging.Logger;
+
 import adaptation.ABSystem.ABConfiguration;
 import adaptation.FeedbackLoop;
 import util.SoftwareVersion;
 
 public class Executor {
 
+    private Logger logger = Logger.getLogger(Executor.class.getName());
     private FeedbackLoop feedbackLoop;
 
     public Executor(FeedbackLoop feedbackLoop) {
@@ -19,6 +22,7 @@ public class Executor {
         knowledge.getNextComponent().ifPresentOrElse(c -> {
             c.handleComponentInPipeline(this.feedbackLoop);
         }, () -> {
+            this.logger.info("No next component found - stopping the feedback loop.");
             this.feedbackLoop.stopFeedbackLoop();
         });
     }

@@ -40,5 +40,14 @@ public class URLRequest {
     // }
 
 
+    public static String getCSVOutputHeader() {
+        return "\"Target URL\",\"Client ID\",\"Response time\"";
+    }
+
+    public String toCsvFormat() {
+        return String.format("%s,%s,%.4f", this.getTarget(), this.getClientId(), this.getResponseTime());
+    }
+
+
     public enum ABInstance {A, B}
 }
