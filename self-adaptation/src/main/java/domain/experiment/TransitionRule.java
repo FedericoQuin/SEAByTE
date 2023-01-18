@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import domain.experiment.StatisticalTest.StatisticalResult;
+import domain.experiment.statistic.StatisticalTest.StatisticalResult;
 
 public class TransitionRule {
     private String name;

@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.google.gson.JsonParser;
 
 import dashboard.model.ABRepository;
-import domain.experiment.StatisticalTest.StatisticalResult;
 import domain.experiment.TransitionRule;
 import domain.experiment.TransitionRule.ConditionTransitionRule.Operator;
 import domain.experiment.TransitionRule.NormalConditionTransitionRule;
 import domain.experiment.TransitionRule.StatisticalConditionTransitionRule;
 import domain.experiment.TransitionRule.TransitionRuleBuilder;
+import domain.experiment.statistic.StatisticalTest.StatisticalResult;
 
 @Controller
 @RequestMapping("/rule")

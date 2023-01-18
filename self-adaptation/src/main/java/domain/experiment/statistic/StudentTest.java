@@ -1,7 +1,6 @@
-package domain.experiment;
+package domain.experiment.statistic;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.commons.math3.stat.inference.TTest;
 
@@ -13,16 +12,17 @@ public class StudentTest extends StatisticalTest<Double> {
     }
 
     @Override
-    public StatisticalResult validateNullHypothesisTyped(List<Double> samples1, List<Double> samples2) {
+    public StatisticalResultWithPValue validateNullHypothesisTyped(List<Double> samples1, List<Double> samples2) {
         double result = new TTest().homoscedasticTTest(
                 samples1.stream().limit(this.getSamples()).mapToDouble(Double::doubleValue).toArray(), 
                 samples2.stream().limit(this.getSamples()).mapToDouble(Double::doubleValue).toArray()
         );
 
-        Logger.getLogger(StudentTest.class.getName()).info(String.format("P value observed: %f", result));
+        // Logger.getLogger(StudentTest.class.getName()).info(String.format("P value observed: %f", result));
         
         // True means reject, false is inconclusive
-        return result <= this.getPValue() ? StatisticalResult.Reject : StatisticalResult.Inconclusive;
+        return result <= this.getPValue() ? new StatisticalResultWithPValue(StatisticalResult.Reject, result) 
+            : new StatisticalResultWithPValue(StatisticalResult.Inconclusive, result);
     }
 
     @Override

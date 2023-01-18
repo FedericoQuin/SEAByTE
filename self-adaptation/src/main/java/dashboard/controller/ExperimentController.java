@@ -23,12 +23,12 @@ import dashboard.model.ABRepository;
 import dashboard.service.ABExperimentService;
 import domain.ABSetting;
 import domain.experiment.Experiment;
-import domain.experiment.ProportionalTest;
-import domain.experiment.StatisticalTest;
-import domain.experiment.StatisticalTest.NullHypothesis;
-import domain.experiment.StatisticalTest.NullHypothesis.Operator;
-import domain.experiment.StudentTest;
-import domain.experiment.WelshStudentTest;
+import domain.experiment.statistic.ProportionalTest;
+import domain.experiment.statistic.StatisticalTest;
+import domain.experiment.statistic.StatisticalTest.NullHypothesis;
+import domain.experiment.statistic.StatisticalTest.NullHypothesis.Operator;
+import domain.experiment.statistic.StudentTest;
+import domain.experiment.statistic.WelshStudentTest;
 
 @Controller
 @RequestMapping("/experiment")

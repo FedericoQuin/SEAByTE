@@ -8,6 +8,7 @@ import adaptation.FeedbackLoop;
 import domain.ABComponent;
 import domain.ABSetting;
 import domain.command.Command;
+import domain.experiment.statistic.StatisticalTest;
 import domain.setup.Setup;
 
 public class Experiment<T> implements ABComponent {

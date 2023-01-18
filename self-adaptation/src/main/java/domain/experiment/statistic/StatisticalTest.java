@@ -1,4 +1,4 @@
-package domain.experiment;
+package domain.experiment.statistic;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -90,11 +90,11 @@ public abstract class StatisticalTest<T> {
 
 
 
-    public StatisticalResult validateNullHypothesis(List<URLRequest> samples1, List<URLRequest> samples2) {
+    public StatisticalResultWithPValue validateNullHypothesis(List<URLRequest> samples1, List<URLRequest> samples2) {
         return this.validateNullHypothesisTyped(this.metric.extractRelevantData(samples1), 
             this.metric.extractRelevantData(samples2));
     }
-    public abstract StatisticalResult validateNullHypothesisTyped(List<T> samples1, List<T> samples2);
+    public abstract StatisticalResultWithPValue validateNullHypothesisTyped(List<T> samples1, List<T> samples2);
 
 
     public abstract String toHtmlString();
@@ -143,16 +143,18 @@ public abstract class StatisticalTest<T> {
             return String.format("'%s %s %s'", this.leftOperand, this.operator.toString(), this.rightOperand);
         }
     }
+
     
     public enum StatisticalResult {
         Reject,
         Inconclusive;
-    
+        
         public static StatisticalResult getStatisticalResult(String name) {
             return Arrays.stream(StatisticalResult.values())
-                .filter(r -> r.toString().toLowerCase().equals(name))
-                .findFirst().orElseThrow();
+            .filter(r -> r.toString().toLowerCase().equals(name))
+            .findFirst().orElseThrow();
         }
-
+        
     }
+    public record StatisticalResultWithPValue(StatisticalResult result, double pvalue) {} 
 }

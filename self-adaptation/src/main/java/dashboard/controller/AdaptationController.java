@@ -20,8 +20,8 @@ import adaptation.FeedbackLoop;
 import adaptation.Knowledge.WorkflowStep;
 import dashboard.model.ABRepository;
 import domain.experiment.Experiment;
-import domain.experiment.StatisticalTest;
 import domain.experiment.UserProfile;
+import domain.experiment.statistic.StatisticalTest;
 import domain.pipeline.Pipeline;
 import domain.setup.Setup;
 

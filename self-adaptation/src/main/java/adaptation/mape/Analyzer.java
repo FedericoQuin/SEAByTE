@@ -5,10 +5,13 @@ import java.util.logging.Logger;
 import adaptation.FeedbackLoop;
 import adaptation.Knowledge;
 import domain.experiment.Experiment;
-import domain.experiment.StatisticalTest;
-import domain.experiment.StatisticalTest.StatisticalResult;
+import domain.experiment.statistic.StatisticalTest;
+import domain.experiment.statistic.StatisticalTest.StatisticalResultWithPValue;
 
 public class Analyzer {
+
+    private static Logger logger = Logger.getLogger(Analyzer.class.getName());
+    
     private Knowledge knowledge;
     
     public Analyzer(FeedbackLoop feedbackLoop) {
@@ -28,10 +31,12 @@ public class Analyzer {
         if (test.getMetric().extractRelevantDataAsStream(this.knowledge.getRequestsA()).count() >= requiredSamples 
                 && test.getMetric().extractRelevantDataAsStream(this.knowledge.getRequestsB()).count() >= requiredSamples) {
     
-            StatisticalResult result = test.validateNullHypothesis(this.knowledge.getRequestsA(), this.knowledge.getRequestsB());
+            StatisticalResultWithPValue result = test.validateNullHypothesis(this.knowledge.getRequestsA(), this.knowledge.getRequestsB());
     
-            Logger.getLogger(Analyzer.class.getName()).info(String.format("Result of test: %s", result.toString()));
-            this.knowledge.setStatisticalResult(result);
+            logger.info(String.format("Observed p value: %.6f", result.pvalue()));
+            logger.info(String.format("Result of test: %s", result.result().toString()));
+            this.knowledge.setStatisticalResult(result.result());
+
             return true;
         }
 

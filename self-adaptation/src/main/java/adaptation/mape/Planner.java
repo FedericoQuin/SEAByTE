@@ -8,9 +8,9 @@ import adaptation.Knowledge;
 import adaptation.Knowledge.WorkflowStep;
 import adaptation.Knowledge.WorkflowStepType;
 import domain.experiment.Experiment;
-import domain.experiment.StatisticalTest;
-import domain.experiment.StatisticalTest.StatisticalResult;
 import domain.experiment.TransitionRule;
+import domain.experiment.statistic.StatisticalTest;
+import domain.experiment.statistic.StatisticalTest.StatisticalResult;
 
 public class Planner {
     
