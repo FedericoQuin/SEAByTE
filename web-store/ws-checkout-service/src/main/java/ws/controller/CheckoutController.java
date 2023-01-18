@@ -40,6 +40,12 @@ public class CheckoutController {
 	}
 
 
+	@PostMapping("/clear")
+	public void clear(@CookieValue(name="user-id") UUID userId, HttpServletRequest req) {
+		this.checkoutService.clearPurchase(userId, req);
+	}
+
+
 
 	public record Recommendation(UUID itemId) {}
 	public record BasketItem(UUID itemId, Integer amount) {}

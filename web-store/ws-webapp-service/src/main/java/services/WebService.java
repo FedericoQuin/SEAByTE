@@ -12,6 +12,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+import controller.FeedbackController;
 import controller.WebController;
 
 
@@ -43,6 +44,11 @@ public class WebService {
 	@Bean
 	public WebController webController() {
 		return new WebController();
+	}
+
+	@Bean
+	public FeedbackController feedbackController() {
+		return new FeedbackController();
 	}
 
 }

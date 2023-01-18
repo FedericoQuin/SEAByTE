@@ -7,3 +7,19 @@ users:
       - "clickChanceB"
       - "purchaseChanceA"
       - "purchaseChanceB"
+  - 
+    name: "PurchasingUser"
+    description: "A user that purchases products with a given probability for both application versions."
+    requiredVariables:
+      - "purchaseChanceA"
+      - "purchaseChanceB"
+      - "addRecommendationChanceA"
+      - "addRecommendationChanceB"
+  -
+    name: "FeedbackUser"
+    description: "A user that visits the website and leaves feedback about its interface."
+    requiredVariables:
+      - "feedbackRatingMuA"
+      - "feedbackRatingStdA"
+      - "feedbackRatingMuB"
+      - "feedbackRatingStdB"

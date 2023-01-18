@@ -127,5 +127,18 @@ public class CheckoutService {
 		// Ignore the result of the DELETE request...
 	}
 
+
+	public void clearPurchase(UUID userId, HttpServletRequest req) {
+		WebClient.create().delete()
+			.uri(String.format("ws-basket-service/basket/%s", userId.toString()))
+			.cookies(l -> {
+				Arrays.asList(req.getCookies()).forEach(c -> l.add(c.getName(), c.getValue()));
+			})
+			.retrieve()
+			.bodyToMono(String.class).block();
+	}
+
+
+
 	private record Purchase(UUID userId, Collection<BasketItemWithPrice> items) {}
 }
