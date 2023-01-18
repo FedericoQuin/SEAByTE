@@ -41,6 +41,10 @@ public class LocustRunner {
     }
 
     public void startLocust() throws IOException {
+        this.startLocust(-1);
+    }
+
+    public void startLocust(int abComponentPort) throws IOException {
         if (this.locustProcess != null) {
             throw new RuntimeException("Cannot start UserProfile if another profile is still running. " + 
                 "Make sure the 'stopLocust' method is called first.");
@@ -61,6 +65,9 @@ public class LocustRunner {
         env.put("UserIdLimitA", Integer.toString(this.userIdLimitA));
         env.put("numberOfUsers", Integer.toString(this.numberOfUsers));
         env.put("startId", Integer.toString(this.startingId));
+        if (abComponentPort != -1) {
+            env.put("abComponentPort", Integer.toString(abComponentPort));
+        }
 
         this.locustProcess = pb.start();
     }

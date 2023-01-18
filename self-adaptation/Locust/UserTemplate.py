@@ -27,14 +27,14 @@ class UserTemplate(locust.HttpUser):
                     if instanceClassName == userProfile['name']:
                         self.description = userProfile['description']
                         # UserIdLimitA is provided by default when locust users are started from the dashboard
-                        self.requiredVariables = userProfile['requiredVariables'] + ['UserIdLimitA']
+                        self.requiredVariables = userProfile['requiredVariables'] + ['UserIdLimitA', 'abComponentPort']
                         break
             
         return self.requiredVariables
     
     
-    def getEnvironmentVariable(self, variableName: str) -> Optional[str]:
+    def getEnvironmentVariable(self, variableName: str) -> str:
         if variableName not in self.getRequiredEnvironmentVariables():
             raise Exception(f'Trying to retrieve environment variable "{variableName}" that was not specified as required.')
         else:
-            return os.environ.get(variableName)
+            return os.environ.get(variableName, '')

@@ -215,7 +215,7 @@ public class FeedbackLoop {
         // Start the running of the users testing the application
         this.locustRunners.forEach(r -> {
             try {
-                r.startLocust();
+                r.startLocust(this.knowledge.getABComponentPort(this.knowledge.getABComponentName()));
             } catch (IOException e) {
                 this.monitor.stopPolling();
                 logger.severe(String.format("Failure to start the user profiles.\nException message (%s): %s", 

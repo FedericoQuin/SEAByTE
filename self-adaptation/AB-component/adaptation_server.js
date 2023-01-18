@@ -251,7 +251,7 @@ function parseCookies(raw) {
 }
 
 
-function handleAdaptationFunctions(req, res, requested_url) {
+async function handleAdaptationFunctions(req, res, requested_url) {
 
     if (requested_url.pathname.includes('/adaptation/history')) {
         const params = new URLSearchParams(requested_url.query);
@@ -303,6 +303,15 @@ function handleAdaptationFunctions(req, res, requested_url) {
         state.clearClients();
 
         res.end('Done.')
+    } else if (requested_url.pathname.includes('/adaptation/checkVariant')) {
+        const params = new URLSearchParams(requested_url.query);
+        const client_id = parseInt(params.get('client-id'));
+
+        if (!state.hasClient(client_id)) {
+            res.end(Variant.NULL.name);
+        }
+
+        res.end(state.getGroup(client_id).name);
     } else {
         res.end('Unsupported operation.');
         res.statusCode = 404;

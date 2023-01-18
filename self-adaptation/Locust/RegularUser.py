@@ -13,26 +13,26 @@ class RegularUser(UserTemplate):
     wait_time = locust.between(5, 15)
 
     def on_start(self):
-        self.clientId = AVAILABLE_CLIENT_IDS.pop()
-        self.cookies = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
+        self.clientId: int = AVAILABLE_CLIENT_IDS.pop()
+        self.cookies: dict[str, str] = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
         
-        version = 'A' if self.clientId <= int(self.getEnvironmentVariable('UserIdLimitA')) else 'B'
+        version: str = 'A' if self.clientId <= int(self.getEnvironmentVariable('UserIdLimitA')) else 'B'
             
-        self.chanceClickRec = float(self.getEnvironmentVariable(f'clickChance{version}'))
-        self.chanceBuyRec = float(self.getEnvironmentVariable(f'purchaseChance{version}'))
+        self.chanceClickRec: float = float(self.getEnvironmentVariable(f'clickChance{version}'))
+        self.chanceBuyRec: float = float(self.getEnvironmentVariable(f'purchaseChance{version}'))
 
         if len(ITEMS) == 0:
             raise RuntimeError('No items are present in the system, aborting...')
-        self.items = [i['id'] for i in random.sample(ITEMS, min(len(ITEMS), 10))]
+        self.items: Sequence[str] = [i['id'] for i in random.sample(ITEMS, min(len(ITEMS), 10))]
         
 
     @locust.task(3)
     def addItemToBasket(self):
-        itemId = self.items[random.randrange(0, len(self.items))]
-        amount = random.randrange(1, 50)
+        itemId: str = self.items[random.randrange(0, len(self.items))]
+        amount: int = random.randrange(1, 50)
         
         self.client.post('/basket/add', cookies=self.cookies, 
-                         json={'itemId': str(itemId), 'amount': str(amount)})
+                         json={'itemId': itemId, 'amount': str(amount)})
 
     
     @locust.task(1)
@@ -53,9 +53,9 @@ class RegularUser(UserTemplate):
             return
 
         # roll for chance of viewing recommended items
-        chanceClick = random.random()
+        chanceClick: float = random.random()
         
-        chosenItem = recommendations[random.randrange(0, len(recommendations))]['itemId']
+        chosenItem: str = recommendations[random.randrange(0, len(recommendations))]['itemId']
         
         
         if chanceClick <= self.chanceClickRec:
@@ -69,15 +69,15 @@ class RegularUser(UserTemplate):
             
     
     
-    def getInfoRecItem(self, itemId):
-        self.client.get(f'/recommendation/info/{itemId}', cookies=self.cookies, name='/recommendation/info')
+    def getInfoRecItem(self, itemId: str) -> None:
+        self.client.get(f'/recommendation/info/{itemId}', cookies=self.cookies, name='/recommendation/info') # type: ignore
         time.sleep(1)
         
     
     
-    def buyRecItem(self, itemId):
+    def buyRecItem(self, itemId: str) -> None:
         amount = random.randrange(1, 20)
-        self.client.get(f'/recommendation/buy/{itemId}?{amount}', cookies=self.cookies, name='/recommendation/buy')
+        self.client.get(f'/recommendation/buy/{itemId}?{amount}', cookies=self.cookies, name='/recommendation/buy') # type: ignore
         time.sleep(1)
 
 
