@@ -24,13 +24,13 @@ public class PurchasesRecommendation extends Metric<Boolean, Double> {
     @Override
     public Stream<Boolean> extractRelevantDataAsStream(List<URLRequest> requests) {
         Map<String, List<URLRequest>> requestsPerOrigin = requests.stream()
-            .collect(Collectors.groupingBy(URLRequest::getOrigin));
+            .collect(Collectors.groupingBy(URLRequest::getClientId));
 
         return requestsPerOrigin.entrySet().stream()
             .map(Map.Entry::getValue)
             .flatMap(l -> IntStream.range(0, l.size())
                 .mapToObj(i -> new URLRequestPair(l.get(i), i + 1 == l.size() ? 
-                        new URLRequest("/recommendation", l.get(i).getOrigin(), 0) : l.get(i + 1)))
+                        new URLRequest("/recommendation", l.get(i).getClientId(), 0) : l.get(i + 1)))
                 .map(p -> {
                     // Three options
                     String t1 = p.req1.getTarget();

@@ -26,7 +26,7 @@ public class ClicksRecommendation extends Metric<Boolean, Double> {
     @Override
     public Stream<Boolean> extractRelevantDataAsStream(List<URLRequest> requests) {
         Map<String, List<URLRequest>> requestsPerOrigin = requests.stream()
-            .collect(Collectors.groupingBy(URLRequest::getOrigin));
+            .collect(Collectors.groupingBy(URLRequest::getClientId));
 
         return requestsPerOrigin.entrySet().stream()
             .map(Map.Entry::getValue)
