@@ -36,7 +36,7 @@ public class FeedbackWebApp extends Metric<Double, Double> {
             valuesA.stream().mapToDouble(Double::doubleValue).average().orElse(0.0), 
             String.format("mean(%s_B)", this.getName()),
             valuesB.stream().mapToDouble(Double::doubleValue).average().orElse(0.0),
-            String.format("median(%s_B)", this.getName()),
+            String.format("median(%s_A)", this.getName()),
             valuesA.size() > 0 ? valuesA.get(valuesA.size() / 2) : 0.0,
             String.format("median(%s_B)", this.getName()),
             valuesB.size() > 0 ? valuesB.get(valuesB.size() / 2) : 0.0
