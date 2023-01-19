@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,9 +15,6 @@ import ws.controller.CheckoutController.CheckoutOverview;
 import ws.controller.CheckoutController.Recommendation;
 
 public class CheckoutService {
-
-	private Logger logger = Logger.getLogger(CheckoutService.class.getName());
-
 
 	public CheckoutOverview getOverview(UUID userId, HttpServletRequest req) {
 		var cookies = Arrays.asList(req.getCookies());
@@ -53,7 +49,7 @@ public class CheckoutService {
 
 
 		var recommendations = Arrays.asList(WebClient.create().get()
-			.uri("ws-recommendation-service/recommendation")
+			.uri("ws-nginx-service/recommendation")
 			.cookies(l -> {
 				cookies.forEach(c -> l.add(c.getName(), c.getValue()));
 			})
