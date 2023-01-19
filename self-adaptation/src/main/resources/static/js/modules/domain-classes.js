@@ -102,10 +102,16 @@ export class LocustUser {
     }
 }
 
+
+// Available routing modes: 'classic', 'predetermined'
 export class UserProfile {
-    constructor(name, locustUsers) {
+    static ClassicABRoutingMode = 'Classic';
+    static PredeterminedABRoutingMode = 'Predetermined';
+
+    constructor(name, locustUsers, abRoutingMode='') {
         this.name = name;
         this.locustUsers = locustUsers;
+        this.abRoutingMode = abRoutingMode;
     }
 }
 

@@ -207,6 +207,7 @@ class ABState {
 
 
     adjustWeights(a, b) {
+        this.assignmentFunction = new DefaultAssignmentFunction(a, b);
         this.assignmentFunction.reassignUsers(a, b, this.clients);
     }
 
@@ -215,6 +216,12 @@ class ABState {
         this.assignmentFunction.reassignUsers(a, b, this.clients);
         this.clients.forEach(c => c.group = this.assignmentFunction.determineAssignment(c.id));
         // A and B assigment happens based on the receiver limit of users that are going to connect to the system
+    }
+
+    adjustWeightsWithSplitComponent(a, b) {
+        this.assignmentFunction = new PopulationSplitAssignmentFunction(POPULATION_SPLIT_NAME, POPULATION_SPLIT_TARGET,
+            new DefaultAssignmentFunction(a, b));
+        this.assignmentFunction.reassignUsers(a, b, this.clients);
     }
 
 }
@@ -250,8 +257,56 @@ function parseCookies(raw) {
     return result;
 }
 
+function handleAssignmentFunctions(res, requested_url) {
+    if (requested_url.pathname.includes('/adaptation/changeClassic')) {
+        const params = new URLSearchParams(requested_url.query);
+        const weight_a = parseInt(params.get(Variant.A.name));
+        const weight_b = parseInt(params.get(Variant.B.name));
 
-async function handleAdaptationFunctions(req, res, requested_url) {
+        if (weight_a + weight_b != 100) {
+            res.end(`Invalid weights for A and B: does not add up to a total sum of 100 (sum=${weight_a+weight_b}).`);
+            response.statusCode = 400;
+            return;
+        }
+        
+        // Adjust the weights
+        state.adjustWeights(weight_a, weight_b);
+        res.end(`Adjusted A/B weights of this AB component to ${weight_a} and ${weight_b}.`);
+
+    } else if (requested_url.pathname.includes('/adaptation/changePredetermined')) {
+        const params = new URLSearchParams(requested_url.query);
+        const weight_a = parseInt(params.get(Variant.A.name));
+        const weight_b = parseInt(params.get(Variant.B.name));
+
+        if (weight_a + weight_b != 100) {
+            res.end(`Invalid weights for A and B: does not add up to a total sum of 100 (sum=${weight_a+weight_b}).`);
+            response.statusCode = 400;
+            return;
+        }
+        
+        // Adjust the weights
+        const userLimit = parseInt(params.get('userLimit'));
+        state.adjustWeightsWithCustomAssignment(weight_a, weight_b, userLimit);
+        res.end(`Adjusted A/B weights of this AB component to ${weight_a} and ${weight_b} with custom assignment function.`);
+
+    } else if (requested_url.pathname.includes('/adaptation/changeSplit')) {        const params = new URLSearchParams(requested_url.query);
+        const weight_a = parseInt(params.get(Variant.A.name));
+        const weight_b = parseInt(params.get(Variant.B.name));
+
+        if (weight_a + weight_b != 100) {
+            res.end(`Invalid weights for A and B: does not add up to a total sum of 100 (sum=${weight_a+weight_b}).`);
+            response.statusCode = 400;
+            return;
+        }
+        
+        // Adjust the weights
+        state.adjustWeightsWithSplitComponent(weight_a, weight_b);
+        res.end(`Adjusted A/B weights of this AB component to ${weight_a} and ${weight_b} with a split assignment function.`);
+    }
+}
+
+
+async function handleAdaptationFunctions(res, requested_url) {
 
     if (requested_url.pathname.includes('/adaptation/history')) {
         const params = new URLSearchParams(requested_url.query);
@@ -276,26 +331,7 @@ async function handleAdaptationFunctions(req, res, requested_url) {
         // res.end(history.map(x => `[id ${x.clientId} on requested url '${x.requestedUrl}']: ${(x.duration).toFixed(4)} ms`).join('\n'));
         // res.end(`name = ${AB_COMPONENT_NAME}`);
     } else if (requested_url.pathname.includes('/adaptation/change')) {
-        const params = new URLSearchParams(requested_url.query);
-        const weight_a = parseInt(params.get(Variant.A.name));
-        const weight_b = parseInt(params.get(Variant.B.name));
-
-        if (weight_a + weight_b != 100) {
-            res.end(`Invalid weights for A and B: does not add up to a total sum of 100 (sum=${weight_a+weight_b}).`);
-            response.statusCode = 400;
-            return;
-        }
-        
-        // Adjust the weights
-        if (params.has('userLimit') && POPULATION_SPLIT_NAME === undefined) {
-            const userLimit = parseInt(params.get('userLimit'));
-            state.adjustWeightsWithCustomAssignment(weight_a, weight_b, userLimit);
-            res.end(`Adjusted A/B weights of this AB component to ${weight_a} and ${weight_b} with custom assignment function.`);
-        } else {
-            state.adjustWeights(weight_a, weight_b);
-            res.end(`Adjusted A/B weights of this AB component to ${weight_a} and ${weight_b}.`);
-        }
-
+        handleAssignmentFunctions(res, requested_url);
     } else if (requested_url.pathname.includes('/adaptation/reset')) {
         historyA.length = 0;
         historyB.length = 0;
@@ -326,7 +362,7 @@ const requestListener = async function (req, res) {
     // Make distinction between adaptation requests and regular requests
     const requested_url = url.parse(req.url);
     if (requested_url.pathname.includes('/adaptation')) { 
-        handleAdaptationFunctions(req, res, requested_url);
+        handleAdaptationFunctions(res, requested_url);
         return;
     }
 

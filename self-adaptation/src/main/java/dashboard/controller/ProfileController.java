@@ -22,6 +22,7 @@ import dashboard.model.ABRepository;
 import dashboard.service.UserProfileService;
 import dashboard.service.UserProfileService.LocustProfileInfo;
 import domain.experiment.UserProfile;
+import domain.experiment.UserProfile.ABRoutingMode;
 import domain.experiment.UserProfile.LocustUser;
 
 @Controller
@@ -66,7 +67,10 @@ public class ProfileController {
                             .collect(Collectors.toMap(p -> p.get("variableName").getAsString(), 
                                 p -> p.get("variableValue").getAsString()))
                 ))
-                .toList()
+                .toList(),
+            root.get("abRoutingMode").getAsString().isEmpty() ? 
+                ABRoutingMode.getDefaultRoutingMode() : 
+                ABRoutingMode.getRoutingMode(root.get("abRoutingMode").getAsString())
         );
 
         repository.addUserProfile(profile);

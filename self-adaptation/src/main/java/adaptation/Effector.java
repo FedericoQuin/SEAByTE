@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import domain.command.Command;
+import domain.experiment.UserProfile;
 import util.Networking;
 
 public class Effector implements IEffector {
@@ -37,15 +38,19 @@ public class Effector implements IEffector {
     @Override
     public void setABRouting(String ABComponentName, int a, int b) {
         int networkPort = this.feedbackLoop.getKnowledge().getABComponentPort(ABComponentName);
-        int userLimit = this.feedbackLoop.getKnowledge().getUserProfile().getNumberOfUsers();
+        UserProfile profile = this.feedbackLoop.getKnowledge().getUserProfile();
 
-        logger.info(String.format("Adjusting weights for the AB component: A=%d B=%d LIMIT=%d", a, b, userLimit));
-
-        String url = String.format(
-            "http://localhost:%d/adaptation/change?A=%d&B=%d&userLimit=%d",
-            networkPort, a, b, userLimit
-        );
+        String url = switch (profile.getABRoutingMode()) {
+            case Classic -> String.format("http://localhost:%d/adaptation/changeClassic?A=%d&B=%d", 
+                networkPort, a, b);
+            case PredeterminedById -> String.format("http://localhost:%d/adaptation/changePredetermined?A=%d&B=%d&userLimit=%d", 
+                networkPort, a, b, profile.getNumberOfUsers());
+            case Split -> String.format("http://localhost:%d/adaptation/changeSplit?A=%d&B=%d", 
+                networkPort, a, b);
+        };
         
+        logger.info(String.format("Adjusting weights for the AB component via the following url: %s", url));
+
         try {
             var connection = new URL(url).openConnection();
             connection.connect();

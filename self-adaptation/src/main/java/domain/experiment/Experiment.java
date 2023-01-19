@@ -40,6 +40,12 @@ public class Experiment<T> implements ABComponent {
         this.deployedSetup = null;
     }
 
+
+    public Experiment(Experiment<?> other, UserProfile profile) {
+        // NOTE: use with caution, at the limits of the java type system
+        this(other.name, other.setup, other.abSetting, profile, other.metrics, (StatisticalTest<T>) other.statisticalTest);
+    }
+
     public String getName() {
         return this.name;
     }

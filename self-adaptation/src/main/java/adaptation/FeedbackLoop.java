@@ -26,6 +26,7 @@ import domain.URLRequest;
 import domain.experiment.Experiment;
 import domain.experiment.TransitionRule;
 import domain.experiment.UserProfile;
+import domain.experiment.UserProfile.ABRoutingMode;
 import domain.locust.LocustRunner;
 import domain.pipeline.Pipeline;
 import domain.setup.Setup;
@@ -277,11 +278,17 @@ public class FeedbackLoop {
             .map(s -> new Setup(s, newParam))
             .collect(Collectors.toSet());
 
+        // Adjust the assignment functions of the user profiles used in the pipeline
+        Set<UserProfile> customUserProfiles = this.knowledge.getExperiments().stream()
+            .map(Experiment::getUserProfile)
+            .map(p -> new UserProfile(p, ABRoutingMode.Split))
+            .collect(Collectors.toSet());
+
         this.logger.info("Retrieving pipeline from the knowledge.");
         Pipeline pipeline = this.knowledge.getPipeline(pipelineName);
 
         this.logger.info("Creating thread for the parallel A/B pipeline.");
-        return this.createThreadPipelineExecution(pipeline, this.retrievePipelineComponents(pipeline, customSetups));
+        return this.createThreadPipelineExecution(pipeline, this.retrievePipelineComponents(pipeline, customSetups, customUserProfiles));
     }
 
     private Thread createThreadPipelineExecution(Pipeline pipeline, PipelineComponents components) {
@@ -302,7 +309,7 @@ public class FeedbackLoop {
     }
 
 
-    private PipelineComponents retrievePipelineComponents(Pipeline pipeline, Set<Setup> customSetups) {
+    private PipelineComponents retrievePipelineComponents(Pipeline pipeline, Set<Setup> customSetups, Set<UserProfile> customProfiles) {
         if (pipeline == null) {
             return null;
         }
@@ -312,9 +319,17 @@ public class FeedbackLoop {
             .collect(Collectors.toSet());
         var setupNames = experiments.stream().map(Experiment::getSetup).toList();
 
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        Set<Experiment<?>> customExperiments = experiments.stream()
+            .map(e -> new Experiment(e, customProfiles.stream()
+                .filter(p -> e.getUserProfile().getName().equals(p))
+                .findFirst().orElseThrow())
+            )
+            .collect(Collectors.toSet());
+
         return new PipelineComponents(
             customSetups.stream().filter(s -> setupNames.contains(s.getName())).collect(Collectors.toSet()), 
-            experiments, 
+            customExperiments, 
             pipeline.getTransitionRules().stream()
                 .map(r -> this.knowledge.getTransitionRule(r))
                 .collect(Collectors.toSet()), 
