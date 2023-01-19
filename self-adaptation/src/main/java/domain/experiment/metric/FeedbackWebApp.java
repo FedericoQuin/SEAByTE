@@ -28,8 +28,8 @@ public class FeedbackWebApp extends Metric<Double, Double> {
 
     @Override
     public Map<String, Double> getExtraMetrics(List<URLRequest> requestsA, List<URLRequest> requestsB) {
-        List<Double> valuesA = this.extractRelevantDataAsStream(requestsA).mapToDouble(Double::doubleValue).boxed().toList();
-        List<Double> valuesB = this.extractRelevantDataAsStream(requestsB).mapToDouble(Double::doubleValue).boxed().toList();
+        List<Double> valuesA = this.extractRelevantDataAsStream(requestsA).sorted().toList();
+        List<Double> valuesB = this.extractRelevantDataAsStream(requestsB).sorted().toList();
 
         return Map.of(
             String.format("mean(%s_A)", this.getName()),
