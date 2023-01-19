@@ -251,18 +251,18 @@ services:
 
 
 
-  nginx-service:
+  ws-nginx-service:
     build:
       context: .
       dockerfile: nginx-service/Dockerfile
-    image: nginx-service-image:latest
+    image: ws-nginx-service-image:latest
     ports: 
       # - 22:22
       - 8080:80
     networks:
       custom-network:
         aliases:
-          - nginx-service-${VERSION}
+          - ws-nginx-service-${VERSION}
     depends_on:
       - ws-registration-service
       - ws-webapp-service
