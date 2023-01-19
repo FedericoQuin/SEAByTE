@@ -13,7 +13,8 @@ public class LocustRunner {
     private final static String LOCUST_COMMAND_TEMPLATE = "./venv/bin/python3 ./venv/bin/locust " +
         "--headless --users %d --spawn-rate %d -H http://localhost:8080 -f %s";
 
-    private static int MAX_SPAWN_RATE = 10;
+    private static int MAX_SPAWN_RATE = 100;
+    private static int MIN_SPAWN_RATE = 10;
 
     private String locustUser;
     private int numberOfUsers;
@@ -50,8 +51,12 @@ public class LocustRunner {
                 "Make sure the 'stopLocust' method is called first.");
         }
 
-        String command = String.format(LocustRunner.LOCUST_COMMAND_TEMPLATE, 
-            this.numberOfUsers, Math.min(this.numberOfUsers, LocustRunner.MAX_SPAWN_RATE), this.locustUser);
+        String command = String.format(
+            LocustRunner.LOCUST_COMMAND_TEMPLATE,
+            this.numberOfUsers,
+            Math.max(Math.min(this.numberOfUsers / 60, LocustRunner.MAX_SPAWN_RATE), LocustRunner.MIN_SPAWN_RATE),
+            this.locustUser
+        );
 
         var pb = new ProcessBuilder(command.split(" "))
             .directory(LocustRunner.pathLocustFiles.toFile())
