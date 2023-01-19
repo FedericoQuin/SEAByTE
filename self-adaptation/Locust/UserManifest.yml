@@ -23,3 +23,11 @@ users:
       - "feedbackRatingStdA"
       - "feedbackRatingMuB"
       - "feedbackRatingStdB"
+  -
+    name: "RecommendationUser"
+    description: "A regular user that makes purchases in the web-store, adding recommended items to his basket with a given chance."
+    requiredVariables:
+      - "clickRecommendationChanceA"
+      - "clickRecommendationChanceB"
+      - "addRecommendationChanceA"
+      - "addRecommendationChanceB"
