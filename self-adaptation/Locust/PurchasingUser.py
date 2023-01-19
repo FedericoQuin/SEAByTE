@@ -19,7 +19,8 @@ class PurchasingUser(UserTemplate):
     def on_start(self):
         assignment: int = AVAILABLE_CLIENT_IDS.pop() - 1
 
-        self.clientIds: list[int] = list(range(assignment * 340, (assignment + 1) * 3400))
+        self.clientIds: list[int] = list(range(assignment * 3400, (assignment + 1) * 3400))
+        random.shuffle(self.clientIds)
         self.userIds: dict[int, str] = {k: str(uuid.uuid4()) for k in self.clientIds}
         
         self.index: int = 0
@@ -67,7 +68,7 @@ class PurchasingUser(UserTemplate):
         if response.status_code == 200 and len(data['items']):
             time.sleep(1)
             
-            variant: str = 'A' if not self.isPurchasingUser else \
+            variant: str = 'A' if self.isPurchasingUser else \
                 self.client.get(f'http://localhost:{self.abComponentPort}/adaptation/checkVariant?client-id={self.client_id}').text
             
             self.handleRecommendations(data['recommendations'], variant)
