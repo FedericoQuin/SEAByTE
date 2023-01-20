@@ -1,6 +1,6 @@
 
 
-from typing import Sequence
+from typing import Sequence, List, Dict
 from UserTemplate import UserTemplate
 import locust
 import random
@@ -19,9 +19,9 @@ class RecommendationUser(UserTemplate):
     def on_start(self):
         assignment: int = AVAILABLE_CLIENT_IDS.pop() - 1
 
-        self.clientIds: list[int] = list(range(assignment * 3400, (assignment + 1) * 3400))
+        self.clientIds: List[int] = list(range(assignment * 3400, (assignment + 1) * 3400))
         random.shuffle(self.clientIds)
-        self.userIds: dict[int, str] = {k: str(uuid.uuid4()) for k in self.clientIds}
+        self.userIds: Dict[int, str] = {k: str(uuid.uuid4()) for k in self.clientIds}
         
         self.index: int = 0
         self.isPurchasingUser = False
@@ -45,8 +45,8 @@ class RecommendationUser(UserTemplate):
         
         
     def update_cookies(self) -> None:
-        self.client_id = self.clientIds[self.index % len(self.clientIds)]
-        self.cookies = {'client-id': str(self.client_id), 'user-id': self.userIds[self.client_id]}
+        self.client_id: int = self.clientIds[self.index % len(self.clientIds)]
+        self.cookies: Dict[str, str] = {'client-id': str(self.client_id), 'user-id': self.userIds[self.client_id]}
         self.isPurchasingUser = self.client_id in PURCHASING_USER_IDS
         self.index += 1
         

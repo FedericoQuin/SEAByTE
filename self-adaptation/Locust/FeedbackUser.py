@@ -1,5 +1,5 @@
 
-from typing import Sequence
+from typing import Dict
 from UserTemplate import UserTemplate
 import locust
 import random
@@ -10,16 +10,16 @@ from Static import AVAILABLE_CLIENT_IDS
 class FeedbackUser(UserTemplate):
     wait_time = locust.between(5, 15)
 
-    MIN_SCORE = 0
-    MAX_SCORE = 10
+    MIN_SCORE: int = 0
+    MAX_SCORE: int = 10
     
     @staticmethod
     def clamp(value: float):
         return max(min(value, FeedbackUser.MAX_SCORE), FeedbackUser.MIN_SCORE)
 
     def on_start(self):
-        self.clientId = AVAILABLE_CLIENT_IDS.pop()
-        self.cookies = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
+        self.clientId: int = AVAILABLE_CLIENT_IDS.pop()
+        self.cookies: Dict[str, str] = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
         
         version: str = 'A' if self.clientId <= int(self.getEnvironmentVariable('UserIdLimitA')) else 'B'
         

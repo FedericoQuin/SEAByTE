@@ -1,7 +1,7 @@
 
 import os
 import json
-from typing import Any, Sequence
+from typing import Any, Sequence, List
 from urllib import request
 
 
@@ -13,7 +13,7 @@ def retrieve_purchasing_users() -> Sequence[int]:
         return [int(i) for i in f.read().split('\n') if i != '']
 
 
-AVAILABLE_CLIENT_IDS: list[int] = list(range(int(os.environ.get('startId', '0')), 
+AVAILABLE_CLIENT_IDS: List[int] = list(range(int(os.environ.get('startId', '0')), 
                                   int(os.environ.get('startId', '0')) + int(os.environ.get('numberOfUsers', '0'))))
 ITEMS: Sequence[Any] = json.load(request.urlopen('http://localhost:8080/items'))
 

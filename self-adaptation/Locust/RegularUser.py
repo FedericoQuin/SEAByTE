@@ -1,5 +1,5 @@
 
-from typing import Sequence
+from typing import Sequence, Dict
 from UserTemplate import UserTemplate
 import locust
 import random
@@ -14,7 +14,7 @@ class RegularUser(UserTemplate):
 
     def on_start(self):
         self.clientId: int = AVAILABLE_CLIENT_IDS.pop()
-        self.cookies: dict[str, str] = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
+        self.cookies: Dict[str, str] = {'client-id': str(self.clientId), 'user-id': str(uuid.uuid4())}
         
         version: str = 'A' if self.clientId <= int(self.getEnvironmentVariable('UserIdLimitA')) else 'B'
             
