@@ -41,9 +41,8 @@ public class Experiment<T> implements ABComponent {
     }
 
 
-    public Experiment(Experiment<?> other, UserProfile profile) {
-        // NOTE: use with caution, at the limits of the java type system
-        this(other.name, other.setup, other.abSetting, profile, other.metrics, (StatisticalTest<T>) other.statisticalTest);
+    public Experiment(Experiment<T> other, UserProfile profile) {
+        this(other.name, other.setup, other.abSetting, profile, other.metrics, other.statisticalTest);
     }
 
     public String getName() {

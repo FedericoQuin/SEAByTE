@@ -318,11 +318,12 @@ public class FeedbackLoop {
             .map(e -> this.knowledge.getExperiment(e))
             .collect(Collectors.toSet());
         var setupNames = experiments.stream().map(Experiment::getSetup).toList();
-
+        
+        // NOTE cheating the java type system again
         @SuppressWarnings({"unchecked", "rawtypes"})
-        Set<Experiment<?>> customExperiments = experiments.stream()
+        Set<Experiment<?>> customExperiments = (Set<Experiment<?>>) (Object) experiments.stream()
             .map(e -> new Experiment(e, customProfiles.stream()
-                .filter(p -> e.getUserProfile().getName().equals(p))
+                .filter(p -> e.getUserProfile().getName().equals(p.getName()))
                 .findFirst().orElseThrow())
             )
             .collect(Collectors.toSet());
