@@ -41,4 +41,9 @@ public class HistoryService {
 			.limit(limit)
 			.toList();
 	}
+
+	public void clearHistory() {
+		this.logger.info("Clearing the history of all purchases.");
+		this.repository.deleteAll();
+	}
 }
