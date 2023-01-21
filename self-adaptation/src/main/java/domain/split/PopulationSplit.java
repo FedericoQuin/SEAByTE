@@ -38,6 +38,11 @@ public class PopulationSplit implements ABComponent {
         this.splitComponent = splitComponent;
     }
 
+    public PopulationSplit(PopulationSplit other) {
+        this(other.name, other.pipelineName1, other.pipelineName2, other.targetValue1, other.targetValue2,
+            other.nextComponent, new NewService(other.splitComponent.serviceName(), other.splitComponent.imageName()));
+    }
+
 
     @Override
     public String getName() {

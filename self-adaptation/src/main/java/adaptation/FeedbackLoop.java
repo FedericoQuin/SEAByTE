@@ -333,13 +333,13 @@ public class FeedbackLoop {
             customSetups.stream().filter(s -> setupNames.contains(s.getName())).collect(Collectors.toSet()), 
             customExperiments, 
             pipeline.getTransitionRules().stream()
-                .map(r -> this.knowledge.getTransitionRule(r))
+                .map(r -> new TransitionRule(this.knowledge.getTransitionRule(r))) // Make copy
                 .collect(Collectors.toSet()), 
             pipeline.getPopulationSplits().stream()
-                .map(s -> this.knowledge.getPopulationSplit(s))
+                .map(s -> new PopulationSplit(this.knowledge.getPopulationSplit(s))) // Make copy
                 .collect(Collectors.toSet()), 
             pipeline.getPipelines().stream()
-                .map(p -> this.knowledge.getPipeline(p))
+                .map(p -> new Pipeline(this.knowledge.getPipeline(p))) // Make copy
                 .collect(Collectors.toSet())
         );
     }

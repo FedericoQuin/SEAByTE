@@ -23,6 +23,10 @@ public class TransitionRule {
         this.conditions = conditions;
     }
 
+    public TransitionRule(TransitionRule other) {
+        this(other.name, other.fromExperiment, other.toComponent, other.conditions.stream().map(c -> c.copy()).toList());
+    }
+
 
     public String getName() {
         return this.name;
@@ -54,6 +58,8 @@ public class TransitionRule {
     public abstract static class ConditionTransitionRule {
         public abstract <T extends Comparable<T>> boolean evaluate(Map<String, StatisticalResult> statVariables, 
                 Map<String, T> extraVariables);
+
+        public abstract ConditionTransitionRule copy();
 
         public enum Operator {
             Equal("=="),
@@ -116,6 +122,12 @@ public class TransitionRule {
             return false;
         }
 
+        @Override
+        public ConditionTransitionRule copy() {
+            return new NormalConditionTransitionRule(this.variableName1, Operator.getOperator(this.operator.getRep()), 
+                this.variableName2);
+        }
+
 
         @Override
         public String toString() {
@@ -144,6 +156,12 @@ public class TransitionRule {
                 .severe(String.format("Required statistical variable '%s' not present in the provided map of variables.", 
                 this.variableName));
             return false;
+        }
+
+        @Override
+        public ConditionTransitionRule copy() {
+            return new StatisticalConditionTransitionRule(this.variableName, Operator.getOperator(this.operator.getRep()), 
+                this.result);
         }
 
         @Override

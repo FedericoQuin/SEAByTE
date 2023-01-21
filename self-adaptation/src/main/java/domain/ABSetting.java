@@ -10,6 +10,10 @@ public class ABSetting {
         this.weightB = w2;
     }
 
+    public ABSetting(ABSetting other) {
+        this(other.weightA, other.weightB);
+    }
+
     public int getWeightA() {
         return this.weightA;
     }

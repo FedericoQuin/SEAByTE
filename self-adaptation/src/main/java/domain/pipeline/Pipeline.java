@@ -1,5 +1,6 @@
 package domain.pipeline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Pipeline {
@@ -21,6 +22,12 @@ public class Pipeline {
         this.transitionRules = transitionRules;
         this.pipelines = pipelines;
         this.populationSplits = populationSplits;
+    }
+
+
+    public Pipeline(Pipeline other) {
+        this(other.name, other.startingComponent, new ArrayList<>(other.experiments), new ArrayList<>(other.transitionRules),
+            new ArrayList<>(other.pipelines), new ArrayList<>(other.populationSplits));
     }
 
 

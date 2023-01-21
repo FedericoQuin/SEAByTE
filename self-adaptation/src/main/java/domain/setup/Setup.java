@@ -41,7 +41,12 @@ public class Setup {
     }
     
     public Setup(Setup other, Map<String, String> extraParamsAB) {
-        this(other.name, other.versionA, other.versionB, other.abComponent, other.serviceToRemove, other.removedService,
+        this(other.name, 
+            new NewService(other.versionA.serviceName, other.versionA.imageName),
+            new NewService(other.versionB.serviceName, other.versionB.imageName),
+            new NewService(other.abComponent.serviceName, other.abComponent.imageName),
+            other.serviceToRemove,
+            new NewService(other.removedService.serviceName, other.removedService.imageName),
             Stream.concat(other.extraParamsAB.entrySet().stream(), extraParamsAB.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }

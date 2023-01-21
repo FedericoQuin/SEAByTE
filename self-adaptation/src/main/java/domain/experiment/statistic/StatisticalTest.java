@@ -1,6 +1,7 @@
 package domain.experiment.statistic;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +64,11 @@ public abstract class StatisticalTest<T> {
                 "required data type used in the statistical test.");
         }
     }
+
+    public StatisticalTest(StatisticalTest<T> other) {
+        this(new NullHypothesis<>(other.nullHypothesis), other.pValue, other.samples, 
+            other.resultingVariableName, other.type, new ArrayList<>(other.metrics));
+    }
     
     public String getType() {
         return this.type;
@@ -112,6 +118,13 @@ public abstract class StatisticalTest<T> {
             this.rightOperand = rightOperand;
         }
 
+        public NullHypothesis(NullHypothesis<T> other) {
+            this(Arrays.stream(Operator.values())
+                    .filter(o -> o.toString().equals(other.operator.toString()))
+                    .findFirst().orElseThrow(),
+                other.leftOperand, other.rightOperand);
+        }
+
         public Operator getOperator() {
             return this.operator;
         }
@@ -151,8 +164,8 @@ public abstract class StatisticalTest<T> {
         
         public static StatisticalResult getStatisticalResult(String name) {
             return Arrays.stream(StatisticalResult.values())
-            .filter(r -> r.toString().toLowerCase().equals(name))
-            .findFirst().orElseThrow();
+                .filter(r -> r.toString().toLowerCase().equals(name))
+                .findFirst().orElseThrow();
         }
         
     }

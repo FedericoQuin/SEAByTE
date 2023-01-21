@@ -30,9 +30,7 @@ public class UserProfile {
 
 
     public UserProfile(UserProfile other, ABRoutingMode mode) {
-        this.name = other.name;
-        this.userProfiles = other.userProfiles;
-        this.abRoutingMode = mode;
+        this(other.name, other.userProfiles.stream().map(l -> l.copy()).toList(), mode);
     }
 
 
@@ -54,7 +52,11 @@ public class UserProfile {
         return this.userProfiles;
     }
 
-    public record LocustUser(String name, int numberOfUsers, Map<String, String> extraProperties) {}
+    public record LocustUser(String name, int numberOfUsers, Map<String, String> extraProperties) {
+        public LocustUser copy() {
+            return new LocustUser(this.name, this.numberOfUsers, new HashMap<>(this.extraProperties));
+        }
+    }
 
     public enum ABRoutingMode {
         Classic,

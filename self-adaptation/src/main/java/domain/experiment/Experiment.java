@@ -1,5 +1,6 @@
 package domain.experiment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,7 +43,8 @@ public class Experiment<T> implements ABComponent {
 
 
     public Experiment(Experiment<T> other, UserProfile profile) {
-        this(other.name, other.setup, other.abSetting, profile, other.metrics, other.statisticalTest);
+        this(other.name, other.setup, new ABSetting(other.abSetting), profile, new ArrayList<>(other.metrics), 
+            other.statisticalTest);
     }
 
     public String getName() {
