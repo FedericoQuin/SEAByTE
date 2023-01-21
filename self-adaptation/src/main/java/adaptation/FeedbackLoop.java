@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -460,17 +461,22 @@ public class FeedbackLoop {
             return;
         }
 
-        monitor.monitor();
-
-        boolean shouldAdapt = analyzer.analyze();
-
-        if (shouldAdapt) {
-            // If the system should adapt the required amount of data samples is reached
-            //  ---> stop the user profiles from running
-            this.stopLocustRunners();
-
-            planner.plan();
-            executor.execute();
+        try {
+            monitor.monitor();
+    
+            boolean shouldAdapt = analyzer.analyze();
+    
+            if (shouldAdapt) {
+                // If the system should adapt the required amount of data samples is reached
+                //  ---> stop the user profiles from running
+                this.stopLocustRunners();
+    
+                planner.plan();
+                executor.execute();
+            }
+        } catch(Exception e) {
+            this.logger.severe("Exception thrown in MAPE task: " + e.toString());
+            this.logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
