@@ -100,7 +100,7 @@ public class Analyzer {
             writer.write(String.format("Experiment name = \"%s\"\n", experimentName));
             writer.write(String.format("Statistical test used = \"%s\"\n", test.getClass().getName()));
             writer.write(String.format("Required samples for statistical test = %d\n", requiredSamples));
-            writer.write(String.format("Resulting measured p value statistical test = %.4f\n", result.pvalue()));
+            writer.write(String.format("Resulting measured p value statistical test = %.6f\n", result.pvalue()));
             writer.write(String.format("Result of application statistical test (required p value of %.4f) = \"%s\"\n", test.getPValue(), result.result().name()));
             writer.write(String.format("Number of raw samples variant A = %d\n", requestsA.size()));
             writer.write(String.format("Number of raw samples variant B = %d\n", requestsB.size()));
