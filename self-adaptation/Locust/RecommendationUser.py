@@ -51,17 +51,16 @@ class RecommendationUser(UserTemplate):
         self.index += 1
         
 
-    @locust.task(3)
-    def addItemToBasket(self):
+    @locust.task(1)
+    def checkout(self):
         itemId: str = self.items[random.randrange(0, len(self.items))]
         amount: int = random.randrange(1, 50)
         
         self.client.post('/basket/add', cookies=self.cookies, 
                          json={'itemId': str(itemId), 'amount': str(amount)})
-
-    
-    @locust.task(1)
-    def checkout(self):
+        
+        time.sleep(1)
+        
         response = self.client.get('/checkout/overview', cookies=self.cookies)
         data = json.loads(response.text)
         
