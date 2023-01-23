@@ -38,8 +38,8 @@ public class Analyzer {
         // Logger.getLogger(Analyzer.class.getName()).info(
         //     Long.toString(this.knowledge.getRequestsA().stream().filter(test.getMetric().filterFunction()).count()));
 
-        if (test.getMetric().extractRelevantDataAsStream(this.knowledge.getRequestsA()).count() >= requiredSamples 
-                && test.getMetric().extractRelevantDataAsStream(this.knowledge.getRequestsB()).count() >= requiredSamples) {
+        if (test.getMetric().extractRelevantData(this.knowledge.getRequestsA()).size() >= requiredSamples 
+                && test.getMetric().extractRelevantData(this.knowledge.getRequestsB()).size() >= requiredSamples) {
     
             StatisticalResultWithPValue result = test.validateNullHypothesis(this.knowledge.getRequestsA(), this.knowledge.getRequestsB());
     
@@ -126,10 +126,12 @@ public class Analyzer {
 
             FileWriter writer = new FileWriter(file);
             writer.write(URLRequest.getCSVOutputHeader() + "\n");
-            for (URLRequest request : requestsA) {
-                writer.write(request.toCsvFormat() + "\n");
+            synchronized(requestsA) {
+                for (URLRequest request : requestsA) {
+                    writer.write(request.toCsvFormat() + "\n");
+                }
+                
             }
-            
             writer.close();
         } catch (IOException e) {
             logger.severe(String.format("Failed to write all url requests of variant A to file. Exception thrown:"));
@@ -143,10 +145,11 @@ public class Analyzer {
 
             FileWriter writer = new FileWriter(file);
             writer.write(URLRequest.getCSVOutputHeader() + "\n");
-            for (URLRequest request : requestsB) {
-                writer.write(request.toCsvFormat() + "\n");
+            synchronized (requestsB) {
+                for (URLRequest request : requestsB) {
+                    writer.write(request.toCsvFormat() + "\n");
+                }
             }
-            
             writer.close();
         } catch (IOException e) {
             logger.severe(String.format("Failed to write all url requests of variant B to file. Exception thrown:"));

@@ -14,10 +14,14 @@ public abstract class Metric<T, U> {
         this.name = name;
     }
 
-    public String getName() {return this.name;}
+    public String getName() {
+        return this.name;
+    }
 
     public List<T> extractRelevantData(List<URLRequest> requests) {
-        return this.extractRelevantDataAsStream(requests).toList();
+        synchronized (requests) {
+            return this.extractRelevantDataAsStream(requests).toList();
+        }
     }
     
     

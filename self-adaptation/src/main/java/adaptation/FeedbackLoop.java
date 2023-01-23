@@ -136,7 +136,9 @@ public class FeedbackLoop {
         if (this.blockDuringExecution) {
             try {
                 this.service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {} // TODO handle this exception?
+            } catch (InterruptedException e) {
+                this.logger.log(Level.SEVERE, e.getMessage(), e);
+            } // TODO handle this exception?
         }
     }
 
@@ -388,18 +390,18 @@ public class FeedbackLoop {
     }
 
     public void stopFeedbackLoop(boolean keepKnowledge) {
-        this.service.shutdown();
-        this.service = Executors.newSingleThreadScheduledExecutor();
+        this.isActive = false;
         this.stopLocustRunners();
         this.monitor.stopPolling();
-        this.isActive = false;
         
         this.stopSetup();
-
+        
         if (!keepKnowledge) {
             this.knowledge.reset();
         }
-
+        
+        this.service.shutdown();
+        this.service = Executors.newSingleThreadScheduledExecutor();
     }
 
 
@@ -482,7 +484,7 @@ public class FeedbackLoop {
 
 
 
-    public record PipelineComponents(
+    public static record PipelineComponents(
         Set<Setup> setups,
         Set<Experiment<?>> experiments,
         Set<TransitionRule> rules,

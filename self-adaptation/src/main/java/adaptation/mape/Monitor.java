@@ -57,9 +57,9 @@ public class Monitor {
                     .stream().filter(filter).toList(), instance);
             }
         } catch (IOException e) {
-            this.feedbackLoop.stopFeedbackLoop();
             Logger.getLogger(Monitor.class.getName()).severe("Failed to poll AB server " + e.getClass().getName());
             e.printStackTrace();
+            this.feedbackLoop.stopFeedbackLoop();
         }
     }
 }
